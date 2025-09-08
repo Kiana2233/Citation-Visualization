@@ -1,20 +1,15 @@
-<template>
-  <div class="references-container">
-    <div 
-      v-for="reference in references" 
-      :key="reference.id"
-      class="reference-item"
-    >
-      <span>{{ reference.authors }}</span>
-      <div class="reference-dot" :id="`dot-${reference.id}`"></div>
-    </div>
-  </div>
+<template>  
+<div class="container" ref="containerRef">
+</div>
 </template>
 
 <script setup>
-import { reactive } from 'vue';
+import { reactive, ref, onMounted, nextTick } from 'vue';
+import * as d3 from 'd3';
 
-  const references = reactive([
+const containerRef = ref(null);
+
+const references = reactive([
   {
     id: 1,
     authors: "李树",
@@ -248,54 +243,79 @@ import { reactive } from 'vue';
   },
   {
     id: 59,
-    authors: "Van de Vliert E",
-  }
+    authors: "Van de Vliert E",  }
 ])
+
+// 使用 D3.js 绘制可视化
+function drawVisualization() {
+  // 清空容器
+  d3.select(containerRef.value).selectAll('*').remove()
+  
+  // 获取容器尺寸
+  const container = containerRef.value
+  if (!container) return
+  
+  const margin = { top: 10, right: 20, bottom: 10, left: 10 }
+  const width = container.clientWidth - margin.left - margin.right
+  const height = container.clientHeight - margin.top - margin.bottom
+  
+  if (width < 100 || height < 100) return
+  
+  // 创建SVG
+  const svg = d3.select(containerRef.value)
+    .append('svg')
+    .attr('width', width + margin.left + margin.right)
+    .attr('height', height + margin.top + margin.bottom)
+  
+  const g = svg.append('g')
+    .attr('transform', `translate(${margin.left},${margin.top})`)
+  
+  // 计算每行高度
+  const lineHeight = Math.min(height / references.length, 20)
+  
+  // 绘制文本和点
+  const items = g.selectAll('.reference-item')
+    .data(references)
+    .enter()
+    .append('g')
+    .attr('class', 'reference-item')
+    .attr('transform', (d, i) => `translate(0, ${i * lineHeight})`)
+  
+  // 添加文本
+  items.append('text')
+    .attr('x', 0)
+    .attr('y', lineHeight / 2)
+    .attr('dy', '0.35em')
+    .style('font-size', '12px')
+    .style('fill', 'black')
+    .text(d => `[${d.id}]${d.authors}`)
+    // 添加对齐的黑点
+  items.append('circle')
+    .attr('cx', 120) // 减小距离，从160改为120
+    .attr('cy', lineHeight / 2)
+    .attr('r', 3)
+    .style('fill', 'black')
+    .attr('id', d => `dot-${d.id}`)
+}
+
+// 组件挂载后绘制
+onMounted(() => {
+  nextTick(() => {
+    setTimeout(drawVisualization, 100)
+  })
+  
+  // 监听窗口大小变化
+  window.addEventListener('resize', () => {
+    setTimeout(drawVisualization, 200)
+  })
+})
 
 </script>
 
 <style scoped>
-.references-container {
+.container {
   width: 100%;
   height: 100%;
   overflow-y: auto;
-  padding: 10px;
-  box-sizing: border-box;
-}
-
-.reference-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 8px 0;
-  border-bottom: 1px solid #f0f0f0;
-  min-height: 40px;
-}
-
-.reference-item:last-child {
-  border-bottom: none;
-}
-
-.reference-text {
-  flex: 1;
-  font-size: 14px;
-  line-height: 1.4;
-  color: #333;
-  margin-right: 10px;
-}
-
-.reference-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background-color: #007bff;
-  flex-shrink: 0;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.reference-dot:hover {
-  background-color: #0056b3;
-  transform: scale(1.2);
 }
 </style>
