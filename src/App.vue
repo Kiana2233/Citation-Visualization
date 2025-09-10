@@ -1,38 +1,57 @@
 <template>
   <div id="app-container">
     <header class="top-bar">
-      <span>方式一：<button>button</button></span>
-      <span>方式二：<button>button</button></span>
-      <span>方式三：<button>button</button></span>
+      <span><button @click="currentView = 'home'" :class="{ active: currentView === 'home' }">主页</button></span>
+      <span><button @click="currentView = 'tree'" :class="{ active: currentView === 'tree' }">并列树图</button></span>
+      <span><button @click="currentView = 'transition'" :class="{ active: currentView === 'transition' }">转折递进树图</button></span>
     </header>
 
     <main class="main-content">
-      <section class="column left-column">
-        <Paper />
-      </section>
+      <!-- 主页视图 -->
+      <div v-if="currentView === 'home'" class="home-view">
+        <section class="column left-column">
+          <Paper />
+        </section>
 
-      <section class="column center-column">
-        <div class="component-wrapper">
-          <TimeLine />
-        </div>
-        <div class="component-wrapper">
-          <Words />
-        </div>
-      </section>
+        <section class="column center-column">
+          <div class="component-wrapper">
+            <TimeLine />
+          </div>
+          <div class="component-wrapper">
+            <Words />
+          </div>
+        </section>
 
-      <section class="column right-column">
-        <Visualization />
-      </section>
+        <section class="column right-column">
+          <Visualization />
+        </section>
+      </div>
+
+      <!-- 树图视图 -->
+      <div v-if="currentView === 'tree'" class="tree-view">
+        <TreeDiagram />
+      </div>
+
+      <!-- 转折递进树图视图 -->
+      <div v-if="currentView === 'transition'" class="tree-view">
+        <TransitionTree />
+      </div>
     </main>
   </div>
 </template>
 
 <script setup>
+import { ref } from 'vue'
 import Paper from './components/Paper.vue'
 import Reference from './components/Reference.vue'
 import Visualization from './components/Visualization.vue'
-import Words from './components/Words.vue';
-import TimeLine from './components/TimeLine.vue';
+import Words from './components/Words.vue'
+import TimeLine from './components/TimeLine.vue'
+import TreeDiagram from './components/TreeDiagram.vue'
+import TransitionTree from './components/TransitionTree.vue'
+
+// 当前视图状态
+const currentView = ref('home')
 </script>
 
 <style scoped>
@@ -67,14 +86,69 @@ body, html {
   margin: 0 15px;
 }
 
+/* 按钮美化样式 */
+.top-bar button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.top-bar button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+}
+
+.top-bar button:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.top-bar button:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.3);
+}
+
+/* 激活状态按钮样式 */
+.top-bar button.active {
+  background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+  box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
+}
+
+.top-bar button.active:hover {
+  background: linear-gradient(135deg, #45a049 0%, #4CAF50 100%);
+}
+
 /* 主内容区样式 */
 .main-content {
-  display: flex;
-  flex-direction: row; /* 水平排列三列 */
   flex-grow: 1; /* 占据剩余的所有可用空间 */
   padding: 20px;
-  gap: 20px; /* 设置列之间的间距 */
   overflow: hidden; /* 防止内容溢出 */
+}
+
+/* 主页视图样式 */
+.home-view {
+  display: flex;
+  flex-direction: row; /* 水平排列三列 */
+  height: 100%;
+  gap: 20px; /* 设置列之间的间距 */
+}
+
+/* 树图视图样式 */
+.tree-view {
+  height: 100%;
+  border: 1px solid #dcdfe6;
+  border-radius: 8px;
+  background-color: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  padding: 15px;
 }
 
 /* 通用列样式 */

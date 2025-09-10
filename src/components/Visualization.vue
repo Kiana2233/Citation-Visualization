@@ -280,8 +280,7 @@ function drawVisualization() {
     .append('g')
     .attr('class', 'reference-item')
     .attr('transform', (d, i) => `translate(0, ${i * lineHeight})`)
-  
-  // 添加文本
+    // 添加文本
   items.append('text')
     .attr('x', 0)
     .attr('y', lineHeight / 2)
@@ -289,13 +288,175 @@ function drawVisualization() {
     .style('font-size', '12px')
     .style('fill', 'black')
     .text(d => `[${d.id}]${d.authors}`)
-    // 添加对齐的黑点
+    
+  // 添加对齐的黑点
   items.append('circle')
     .attr('cx', 120) // 减小距离，从160改为120
     .attr('cy', lineHeight / 2)
     .attr('r', 3)
     .style('fill', 'black')
-    .attr('id', d => `dot-${d.id}`)
+    .attr('id', d => `dot-${d.id}`)  // 添加半圆线连接指定的ID
+  const connections = [
+    { from: 1, to: 3, color: 'red' },
+    { from: 2, to: 3, color: 'red' },
+    // 1,4,5,6,7,8之间的绿色两两连线
+    { from: 1, to: 4, color: 'green' },
+    { from: 1, to: 5, color: 'green' },
+    { from: 1, to: 6, color: 'green' },
+    { from: 1, to: 7, color: 'green' },
+    { from: 1, to: 8, color: 'green' },
+    { from: 4, to: 5, color: 'green' },
+    { from: 4, to: 6, color: 'green' },
+    { from: 4, to: 7, color: 'green' },
+    { from: 4, to: 8, color: 'green' },
+    { from: 5, to: 6, color: 'green' },
+    { from: 5, to: 7, color: 'green' },
+    { from: 5, to: 8, color: 'green' },
+    { from: 6, to: 7, color: 'green' },
+    { from: 6, to: 8, color: 'green' },
+    { from: 7, to: 8, color: 'green' },
+    // 9,10,11,12,13,3之间的绿色两两连线
+    { from: 9, to: 10, color: 'green' },
+    { from: 9, to: 11, color: 'green' },
+    { from: 9, to: 12, color: 'green' },
+    { from: 9, to: 13, color: 'green' },
+    { from: 9, to: 3, color: 'green' },
+    { from: 10, to: 11, color: 'green' },
+    { from: 10, to: 12, color: 'green' },
+    { from: 10, to: 13, color: 'green' },
+    { from: 10, to: 3, color: 'green' },
+    { from: 11, to: 12, color: 'green' },
+    { from: 11, to: 13, color: 'green' },
+    { from: 11, to: 3, color: 'green' },
+    { from: 12, to: 13, color: 'green' },
+    { from: 12, to: 3, color: 'green' },
+    { from: 13, to: 3, color: 'green' },
+    // 14,15,16,17,18,19,20,21,23之间的绿色两两连线
+    { from: 14, to: 15, color: 'green' },
+    { from: 14, to: 16, color: 'green' },
+    { from: 14, to: 17, color: 'green' },
+    { from: 14, to: 18, color: 'green' },
+    { from: 14, to: 19, color: 'green' },
+    { from: 14, to: 20, color: 'green' },
+    { from: 14, to: 21, color: 'green' },
+    { from: 14, to: 23, color: 'green' },
+    { from: 15, to: 16, color: 'green' },
+    { from: 15, to: 17, color: 'green' },
+    { from: 15, to: 18, color: 'green' },
+    { from: 15, to: 19, color: 'green' },
+    { from: 15, to: 20, color: 'green' },
+    { from: 15, to: 21, color: 'green' },
+    { from: 15, to: 23, color: 'green' },
+    { from: 16, to: 17, color: 'green' },
+    { from: 16, to: 18, color: 'green' },
+    { from: 16, to: 19, color: 'green' },
+    { from: 16, to: 20, color: 'green' },
+    { from: 16, to: 21, color: 'green' },
+    { from: 16, to: 23, color: 'green' },
+    { from: 17, to: 18, color: 'green' },
+    { from: 17, to: 19, color: 'green' },
+    { from: 17, to: 20, color: 'green' },
+    { from: 17, to: 21, color: 'green' },
+    { from: 17, to: 23, color: 'green' },
+    { from: 18, to: 19, color: 'green' },
+    { from: 18, to: 20, color: 'green' },
+    { from: 18, to: 21, color: 'green' },
+    { from: 18, to: 23, color: 'green' },
+    { from: 19, to: 20, color: 'green' },
+    { from: 19, to: 21, color: 'green' },
+    { from: 19, to: 23, color: 'green' },
+    { from: 20, to: 21, color: 'green' },
+    { from: 20, to: 23, color: 'green' },
+    { from: 21, to: 23, color: 'green' },
+    // 24,25,26,27之间的绿色两两连线
+    { from: 24, to: 25, color: 'green' },
+    { from: 24, to: 26, color: 'green' },
+    { from: 24, to: 27, color: 'green' },
+    { from: 25, to: 26, color: 'green' },
+    { from: 25, to: 27, color: 'green' },
+    { from: 26, to: 27, color: 'green' },
+    // 24,25,26的红两两连线
+    { from: 24, to: 25, color: 'red' },
+    { from: 24, to: 26, color: 'red' },
+    // 28,30,31,32,33,34之间的绿两两连线
+    { from: 28, to: 30, color: 'green' },
+    { from: 28, to: 31, color: 'green' },
+    { from: 28, to: 32, color: 'green' },
+    { from: 28, to: 33, color: 'green' },
+    { from: 28, to: 34, color: 'green' },
+    { from: 30, to: 31, color: 'green' },
+    { from: 30, to: 32, color: 'green' },
+    { from: 30, to: 33, color: 'green' },
+    { from: 30, to: 34, color: 'green' },
+    { from: 31, to: 32, color: 'green' },
+    { from: 31, to: 33, color: 'green' },
+    { from: 31, to: 34, color: 'green' },
+    { from: 32, to: 33, color: 'green' },
+    { from: 32, to: 34, color: 'green' },
+    { from: 33, to: 34, color: 'green' },
+    // 35,36,37之间用绿线两两连接
+    { from: 35, to: 36, color: 'green' },
+    { from: 35, to: 37, color: 'green' },
+    { from: 36, to: 37, color: 'green' },
+    // 10，38之间黄线连接
+    { from: 37, to: 10, color: 'orange' },
+    { from: 37, to: 38, color: 'orange' },
+    // 39，40，42之间绿线两两连接
+    { from: 39, to: 40, color: 'green' },
+    { from: 39, to: 42, color: 'green' },
+    { from: 40, to: 42, color: 'green' },
+    // 39，41，43两两用橙线连接
+    { from: 40, to: 39, color: 'orange' },
+    { from: 40, to: 41, color: 'orange' },
+    { from: 42, to: 43, color: 'orange' },
+    // 44，45，46之间用绿线两两连接
+    { from: 44, to: 45, color: 'green' },
+    { from: 44, to: 46, color: 'green' },
+    { from: 45, to: 46, color: 'green' },
+    // 49，47，48之间用绿线两两连接
+    { from: 49, to: 47, color: 'green' },
+    { from: 49, to: 48, color: 'green' },
+    { from: 47, to: 48, color: 'green' },
+    // 1，51之间用绿线连接
+    { from: 1, to: 51, color: 'green' },
+    // 50，52之间用橙线连接
+    { from: 48, to: 50, color: 'orange' },
+    { from: 49, to: 50, color: 'orange' },
+    { from: 51, to: 52, color: 'orange' },
+    { from: 1, to: 52, color: 'orange' },
+    // 57，58，59之间用橙线连接
+    { from: 57, to: 58, color: 'orange' },
+    { from: 57, to: 59, color: 'orange' },
+    { from: 58, to: 59, color: 'orange' },
+    // 53，55，1，56，57之间用绿线连接
+    { from: 53, to: 55, color: 'green' },
+    { from: 53, to: 1, color: 'green' },
+    { from: 53, to: 56, color: 'green' },
+    { from: 53, to: 57, color: 'green' },
+    { from: 55, to: 1, color: 'green' },
+    { from: 55, to: 56, color: 'green' },
+    { from: 55, to: 57, color: 'green' },
+    { from: 1, to: 56, color: 'green' },
+    { from: 1, to: 57, color: 'green' },
+    { from: 56, to: 57, color: 'green' },
+  ]
+  
+  connections.forEach(conn => {
+    const fromY = (conn.from - 1) * lineHeight + lineHeight / 2
+    const toY = (conn.to - 1) * lineHeight + lineHeight / 2
+    const midY = (fromY + toY) / 2
+    const radius = Math.abs(toY - fromY) / 2
+    
+    // 创建半圆路径
+    const path = d3.path()
+    path.arc(120, midY, radius, -Math.PI / 2, Math.PI / 2)
+    
+    g.append('path')
+      .attr('d', path.toString())
+      .style('stroke', conn.color)
+      .style('stroke-width', 2)
+      .style('fill', 'none')
+  })
 }
 
 // 组件挂载后绘制
