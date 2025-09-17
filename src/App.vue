@@ -4,6 +4,7 @@
       <span><button @click="currentView = 'home'" :class="{ active: currentView === 'home' }">主页</button></span>
       <span><button @click="currentView = 'tree'" :class="{ active: currentView === 'tree' }">并列树图</button></span>
       <span><button @click="currentView = 'transition'" :class="{ active: currentView === 'transition' }">转折递进树图</button></span>
+      <span><button @click="currentView = 'full'" :class="{ active: currentView === 'full' }">全文展示图</button></span>
     </header>
 
     <main class="main-content">
@@ -36,6 +37,11 @@
       <div v-if="currentView === 'transition'" class="tree-view">
         <TransitionTree />
       </div>
+
+      <!-- 全文展示图视图 -->
+      <div v-if="currentView === 'full'" class="tree-view">
+        <FullTreeDiagram />
+      </div>
     </main>
   </div>
 </template>
@@ -49,6 +55,7 @@ import Words from './components/Words.vue'
 import TimeLine from './components/TimeLine.vue'
 import TreeDiagram from './components/TreeDiagram.vue'
 import TransitionTree from './components/TransitionTree.vue'
+import FullTreeDiagram from './components/FullTreeDiagram.vue'
 
 // 当前视图状态
 const currentView = ref('home')
