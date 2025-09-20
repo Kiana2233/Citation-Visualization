@@ -1,10 +1,7 @@
 <template>
   <div id="app-container">
     <header class="top-bar">
-      <span><button @click="currentView = 'home'" :class="{ active: currentView === 'home' }">主页</button></span>
-      <span><button @click="currentView = 'tree'" :class="{ active: currentView === 'tree' }">并列树图</button></span>
-      <span><button @click="currentView = 'transition'" :class="{ active: currentView === 'transition' }">转折递进树图</button></span>
-      <span><button @click="currentView = 'full'" :class="{ active: currentView === 'full' }">全文展示图</button></span>
+      <span><button @click="switchToHome" :class="{ active: currentView === 'home' }">主页</button></span>
     </header>
 
     <main class="main-content">
@@ -24,7 +21,18 @@
         </section>
 
         <section class="column right-column">
-          <Visualization />
+          <!-- 根据 rightPanelView 的值显示不同的组件 -->
+          <div class="component-wrapper">
+            <Visualization 
+              v-if="rightPanelView === 'visualization'"
+              @switchToTree="handleSwitchToTree"
+              @switchToTransition="handleSwitchToTransition" 
+              @switchToFull="handleSwitchToFull"
+            />
+            <TreeDiagram v-else-if="rightPanelView === 'tree'" />
+            <TransitionTree v-else-if="rightPanelView === 'transition'" />
+            <FullTreeDiagram v-else-if="rightPanelView === 'full'" />
+          </div>
         </section>
       </div>
 
@@ -59,6 +67,27 @@ import FullTreeDiagram from './components/FullTreeDiagram.vue'
 
 // 当前视图状态
 const currentView = ref('home')
+// 右侧区域显示的组件类型
+const rightPanelView = ref('visualization') // 'visualization', 'tree', 'transition', 'full'
+
+// 处理从 Visualization 组件发出的事件
+const handleSwitchToTree = () => {
+  rightPanelView.value = 'tree'
+}
+
+const handleSwitchToTransition = () => {
+  rightPanelView.value = 'transition'
+}
+
+const handleSwitchToFull = () => {
+  rightPanelView.value = 'full'
+}
+
+// 重置到主页时，右侧面板也重置
+const switchToHome = () => {
+  currentView.value = 'home'
+  rightPanelView.value = 'visualization'
+}
 </script>
 
 <style scoped>

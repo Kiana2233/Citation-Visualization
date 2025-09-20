@@ -1,5 +1,13 @@
 <template>  
 <div class="container" ref="containerRef">
+  <!-- 右上角按钮组 -->
+  <div class="top-right-buttons">
+    <button @click="$emit('switchToTree')" class="nav-btn tree-btn">并列树图</button>
+    <button @click="$emit('switchToTransition')" class="nav-btn transition-btn">转折递进树图</button>
+    <button @click="$emit('switchToFull')" class="nav-btn full-btn">全文展示图</button>
+  </div>
+  <!-- D3 可视化容器 -->
+  <div ref="d3Container" class="d3-container"></div>
 </div>
 </template>
 
@@ -7,7 +15,11 @@
 import { reactive, ref, onMounted, nextTick } from 'vue';
 import * as d3 from 'd3';
 
+// 定义 emit 事件
+const emit = defineEmits(['switchToTree', 'switchToTransition', 'switchToFull']);
+
 const containerRef = ref(null);
+const d3Container = ref(null);
 
 const references = reactive([
   {
@@ -248,11 +260,11 @@ const references = reactive([
 
 // 使用 D3.js 绘制可视化
 function drawVisualization() {
-  // 清空容器
-  d3.select(containerRef.value).selectAll('*').remove()
+  // 清空 D3 容器而不是整个容器
+  d3.select(d3Container.value).selectAll('*').remove()
   
-  // 获取容器尺寸
-  const container = containerRef.value
+  // 获取 D3 容器尺寸
+  const container = d3Container.value
   if (!container) return
   
   const margin = { top: 10, right: 20, bottom: 10, left: 10 }
@@ -262,7 +274,7 @@ function drawVisualization() {
   if (width < 100 || height < 100) return
   
   // 创建SVG
-  const svg = d3.select(containerRef.value)
+  const svg = d3.select(d3Container.value)
     .append('svg')
     .attr('width', width + margin.left + margin.right)
     .attr('height', height + margin.top + margin.bottom)
@@ -477,6 +489,71 @@ onMounted(() => {
 .container {
   width: 100%;
   height: 100%;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+/* D3 可视化容器 */
+.d3-container {
+  flex: 1;
+  width: 100%;
   overflow-y: auto;
+}
+
+/* 右上角按钮组样式 */
+.top-right-buttons {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  gap: 8px;
+  z-index: 1000; /* 确保按钮在最上层 */
+}
+
+.nav-btn {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  color: white;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.nav-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.nav-btn:active {
+  transform: translateY(0);
+}
+
+/* 不同按钮的颜色 */
+.tree-btn {
+  background: linear-gradient(135deg, #4CAF50, #45a049);
+}
+
+.tree-btn:hover {
+  background: linear-gradient(135deg, #45a049, #3d8b40);
+}
+
+.transition-btn {
+  background: linear-gradient(135deg, #FF6B6B, #E55353);
+}
+
+.transition-btn:hover {
+  background: linear-gradient(135deg, #E55353, #D44545);
+}
+
+.full-btn {
+  background: linear-gradient(135deg, #4ECDC4, #45B7AF);
+}
+
+.full-btn:hover {
+  background: linear-gradient(135deg, #45B7AF, #3DA199);
 }
 </style>

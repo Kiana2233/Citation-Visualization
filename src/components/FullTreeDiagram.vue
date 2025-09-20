@@ -3,8 +3,8 @@
     <h2>全文树状图</h2>
     <div class="controls">
       <div class="zoom-controls">
-        <button @click="zoomIn" class="control-btn">放大 +</button>
-        <button @click="zoomOut" class="control-btn">缩小 -</button>
+        <button @click="zoomIn" class="control-btn">放大</button>
+        <button @click="zoomOut" class="control-btn">缩小</button>
         <button @click="resetZoom" class="control-btn">重置</button>
       </div>
       <div class="help-text">

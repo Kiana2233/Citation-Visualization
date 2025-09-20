@@ -1,6 +1,16 @@
 <template>
   <div class="transition-tree-container">
     <h2>转折递进树图</h2>
+    <div class="controls">
+      <div class="zoom-controls">
+        <button @click="zoomIn" class="control-btn">放大</button>
+        <button @click="zoomOut" class="control-btn">缩小</button>
+        <button @click="resetZoom" class="control-btn">重置</button>
+      </div>
+      <div class="help-text">
+        💡 提示：可以用鼠标拖拽和滚轮缩放来浏览完整的树状图
+      </div>
+    </div>
     <div class="tree-content">
       <div ref="treeContainer" class="d3-tree-container"></div>
     </div>
@@ -12,6 +22,34 @@ import { ref, onMounted } from "vue"
 import * as d3 from "d3"
 
 const treeContainer = ref(null)
+let zoomBehavior = null
+let svgElement = null
+
+// 缩放控制方法
+const zoomIn = () => {
+  if (zoomBehavior && svgElement) {
+    svgElement.transition().duration(300).call(
+      zoomBehavior.scaleBy, 1.5
+    )
+  }
+}
+
+const zoomOut = () => {
+  if (zoomBehavior && svgElement) {
+    svgElement.transition().duration(300).call(
+      zoomBehavior.scaleBy, 1 / 1.5
+    )
+  }
+}
+
+const resetZoom = () => {
+  if (zoomBehavior && svgElement) {
+    svgElement.transition().duration(500).call(
+      zoomBehavior.transform,
+      d3.zoomIdentity
+    )
+  }
+}
 
 // 上方树的数据结构
 const upperTreeData = {
@@ -128,12 +166,36 @@ const drawTree = () => {
   const containerHeight = container.clientHeight || 600
   
   const margin = { top: 50, right: 200, bottom: 50, left: 200 }
-  // 创建SVG容器
+  
+  // 创建可缩放的SVG容器
   const svg = d3.select(container)
     .append("svg")
     .attr("width", containerWidth)
     .attr("height", containerHeight)
     .style("border", "1px solid #ddd")
+    .style("cursor", "grab")
+
+  // 添加缩放功能
+  const zoom = d3.zoom()
+    .scaleExtent([0.1, 3])
+    .on("zoom", (event) => {
+      g.attr("transform", event.transform)
+    })
+
+  svg.call(zoom)
+  
+  // 保存缩放行为和SVG元素的引用
+  zoomBehavior = zoom
+  svgElement = svg
+
+  // 添加鼠标按下时的抓取效果
+  svg.on("mousedown", () => {
+    svg.style("cursor", "grabbing")
+  })
+  svg.on("mouseup", () => {
+    svg.style("cursor", "grab")
+  })
+
   const g = svg.append("g")
     .attr("transform", `translate(${margin.left},${margin.top})`)
 
@@ -238,7 +300,39 @@ onMounted(() => {
   text-align: center;
 }
 
+.controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  padding: 0 20px;
+}
 
+.zoom-controls {
+  display: flex;
+  gap: 10px;
+}
+
+.control-btn {
+  padding: 8px 16px;
+  background: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s;
+}
+
+.control-btn:hover {
+  background: #45a049;
+}
+
+.help-text {
+  color: #666;
+  font-size: 14px;
+  font-style: italic;
+}
 
 .tree-content {
   flex: 1;
@@ -256,6 +350,11 @@ onMounted(() => {
   border: 1px solid #e0e0e0;
   overflow: hidden;
   position: relative;
+  cursor: grab;
+}
+
+.d3-tree-container:active {
+  cursor: grabbing;
 }
 
 .d3-tree-container svg {
