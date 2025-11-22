@@ -1,7 +1,7 @@
 <template>
   <div id="app-container">
     <header class="top-bar">
-      <span><button @click="switchToHome" :class="{ active: currentView === 'home' }">主页</button></span>
+      <h1 class="title">参考文献逻辑关系可视化</h1>
     </header>
 
     <main class="main-content">
@@ -12,15 +12,6 @@
         </section>
 
         <section class="column center-column">
-          <div class="component-wrapper">
-            <TimeLine />
-          </div>
-          <div class="component-wrapper">
-            <Words />
-          </div>
-        </section>
-
-        <section class="column right-column">
           <!-- 根据 rightPanelView 的值显示不同的组件 -->
           <div class="component-wrapper">
             <Visualization 
@@ -28,10 +19,20 @@
               @switchToTree="handleSwitchToTree"
               @switchToTransition="handleSwitchToTransition" 
               @switchToFull="handleSwitchToFull"
+              @switchToHome="handleSwitchToHome"
             />
-            <TreeDiagram v-else-if="rightPanelView === 'tree'" />
-            <TransitionTree v-else-if="rightPanelView === 'transition'" />
-            <FullTreeDiagram v-else-if="rightPanelView === 'full'" />
+            <TreeDiagram v-else-if="rightPanelView === 'tree'" @switchToHome="handleSwitchToHome" />
+            <TransitionTree v-else-if="rightPanelView === 'transition'" @switchToHome="handleSwitchToHome" />
+            <FullTreeDiagram v-else-if="rightPanelView === 'full'" @switchToHome="handleSwitchToHome" />
+          </div>
+        </section>
+
+        <section class="column right-column">
+          <div class="component-wrapper">
+            <TimeLine />
+          </div>
+          <div class="component-wrapper">
+            <Words />
           </div>
         </section>
       </div>
@@ -83,9 +84,7 @@ const handleSwitchToFull = () => {
   rightPanelView.value = 'full'
 }
 
-// 重置到主页时，右侧面板也重置
-const switchToHome = () => {
-  currentView.value = 'home'
+const handleSwitchToHome = () => {
   rightPanelView.value = 'visualization'
 }
 </script>
@@ -199,10 +198,10 @@ body, html {
   flex: 1.5; /* 增大Paper组件的宽度 */
 }
 .center-column {
-  flex: 1.5; /* 减小TimeLine和Words组件的宽度 */
+  flex: 2; /* 增大Visualization组件的宽度 */
 }
 .right-column {
-  flex: 2; /* 增大Visualization组件的宽度 */
+  flex: 1.5; /* 减小TimeLine和Words组件的宽度 */
 }
 
 /* 组件包裹容器样式 */

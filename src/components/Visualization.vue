@@ -2,6 +2,7 @@
 <div class="container" ref="containerRef">
   <!-- 右上角按钮组 -->
   <div class="top-right-buttons">
+    <button @click="$emit('switchToHome')" class="nav-btn home-btn">主页</button>
     <button @click="$emit('switchToTree')" class="nav-btn tree-btn">并列树图</button>
     <button @click="$emit('switchToTransition')" class="nav-btn transition-btn">转折递进树图</button>
     <button @click="$emit('switchToFull')" class="nav-btn full-btn">全文展示图</button>
@@ -16,7 +17,7 @@ import { reactive, ref, onMounted, nextTick } from 'vue';
 import * as d3 from 'd3';
 
 // 定义 emit 事件
-const emit = defineEmits(['switchToTree', 'switchToTransition', 'switchToFull']);
+const emit = defineEmits(['switchToHome', 'switchToTree', 'switchToTransition', 'switchToFull']);
 
 const containerRef = ref(null);
 const d3Container = ref(null);
@@ -533,6 +534,14 @@ onMounted(() => {
 }
 
 /* 不同按钮的颜色 */
+.home-btn {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+}
+
+.home-btn:hover {
+  background: linear-gradient(135deg, #764ba2, #667eea);
+}
+
 .tree-btn {
   background: linear-gradient(135deg, #4CAF50, #45a049);
 }
