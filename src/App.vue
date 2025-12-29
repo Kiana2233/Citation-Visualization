@@ -2,13 +2,13 @@
   <div id="app-container">
     <header class="top-bar">
       <h1 class="title">参考文献逻辑关系可视化</h1>
-    </header>
-
-    <main class="main-content">
+    </header>    <main class="main-content">
       <!-- 主页视图 -->
       <div v-if="currentView === 'home'" class="home-view">
         <section class="column left-column">
-          <Paper />
+          <div class="component-wrapper">
+            <PaperHTML />
+          </div>
         </section>
 
         <section class="column center-column">
@@ -57,7 +57,7 @@
 
 <script setup>
 import { ref } from 'vue'
-import Paper from './components/Paper.vue'
+import PaperHTML from './components/PaperHTML.vue'
 import Reference from './components/Reference.vue'
 import Visualization from './components/Visualization.vue'
 import Words from './components/Words.vue'
@@ -191,6 +191,7 @@ body, html {
   display: flex;
   flex-direction: column;
   gap: 20px; /* 设置列内组件的间距 */
+  min-height: 0; /* 关键！允许flex子项收缩 */
 }
 
 /* 各列宽度分配 */
@@ -212,16 +213,20 @@ body, html {
   background-color: #ffffff;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   padding: 15px;
+  box-sizing: border-box; /* 让padding包含在尺寸内 */
   /* 确保组件可以填充整个包裹容器 */
   display: flex;
   flex-direction: column;
+  overflow: hidden; /* 防止子组件溢出 */
 }
 
 /* 让导入的组件内容填满其容器 */
 .component-wrapper > * {
   width: 100%;
-  height: 100%;
-  overflow: auto; /* 如果组件内容过多，则显示滚动条 */
+  flex: 1; /* 使用flex而不是height: 100% */
+  min-height: 0; /* 允许flex子项缩小 */
+  overflow: hidden; /* 让子组件自己控制滚动 */
+  box-sizing: border-box;
 }
 
 </style>
