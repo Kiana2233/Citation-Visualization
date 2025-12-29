@@ -9,21 +9,10 @@
           <div class="component-wrapper">
             <PaperHTML />
           </div>
-        </section>
-
-        <section class="column center-column">
-          <!-- 根据 rightPanelView 的值显示不同的组件 -->
+        </section>        <section class="column center-column">
+          <!-- Visualization 组件现在内部管理页面切换 -->
           <div class="component-wrapper">
-            <Visualization 
-              v-if="rightPanelView === 'visualization'"
-              @switchToTree="handleSwitchToTree"
-              @switchToTransition="handleSwitchToTransition" 
-              @switchToFull="handleSwitchToFull"
-              @switchToHome="handleSwitchToHome"
-            />
-            <TreeDiagram v-else-if="rightPanelView === 'tree'" @switchToHome="handleSwitchToHome" />
-            <TransitionTree v-else-if="rightPanelView === 'transition'" @switchToHome="handleSwitchToHome" />
-            <FullTreeDiagram v-else-if="rightPanelView === 'full'" @switchToHome="handleSwitchToHome" />
+            <Visualization />
           </div>
         </section>
 
@@ -62,31 +51,9 @@ import Reference from './components/Reference.vue'
 import Visualization from './components/Visualization.vue'
 import Words from './components/Words.vue'
 import TimeLine from './components/TimeLine.vue'
-import TreeDiagram from './components/TreeDiagram.vue'
-import TransitionTree from './components/TransitionTree.vue'
-import FullTreeDiagram from './components/FullTreeDiagram.vue'
 
 // 当前视图状态
 const currentView = ref('home')
-// 右侧区域显示的组件类型
-const rightPanelView = ref('visualization') // 'visualization', 'tree', 'transition', 'full'
-
-// 处理从 Visualization 组件发出的事件
-const handleSwitchToTree = () => {
-  rightPanelView.value = 'tree'
-}
-
-const handleSwitchToTransition = () => {
-  rightPanelView.value = 'transition'
-}
-
-const handleSwitchToFull = () => {
-  rightPanelView.value = 'full'
-}
-
-const handleSwitchToHome = () => {
-  rightPanelView.value = 'visualization'
-}
 </script>
 
 <style scoped>

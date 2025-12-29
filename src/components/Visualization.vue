@@ -2,22 +2,29 @@
 <div class="container" ref="containerRef">
   <!-- 右上角按钮组 -->
   <div class="top-right-buttons">
-    <button @click="$emit('switchToHome')" class="nav-btn home-btn">主页</button>
-    <button @click="$emit('switchToTree')" class="nav-btn tree-btn">并列树图</button>
-    <button @click="$emit('switchToTransition')" class="nav-btn transition-btn">转折递进树图</button>
-    <button @click="$emit('switchToFull')" class="nav-btn full-btn">全文展示图</button>
+    <button @click="currentPage = 'home'" class="nav-btn home-btn" :class="{ active: currentPage === 'home' }">主页</button>
+    <button @click="currentPage = 'tree'" class="nav-btn tree-btn" :class="{ active: currentPage === 'tree' }">并列树图</button>
+    <button @click="currentPage = 'transition'" class="nav-btn transition-btn" :class="{ active: currentPage === 'transition' }">转折递进树图</button>
+    <button @click="currentPage = 'full'" class="nav-btn full-btn" :class="{ active: currentPage === 'full' }">全文展示图</button>
   </div>
-  <!-- D3 可视化容器 -->
-  <div ref="d3Container" class="d3-container"></div>
+  
+  <!-- 根据当前页面显示不同内容 -->
+  <div v-if="currentPage === 'home'" ref="d3Container" class="d3-container"></div>
+  <TreeDiagram v-else-if="currentPage === 'tree'" class="page-container" />
+  <TransitionTree v-else-if="currentPage === 'transition'" class="page-container" />
+  <FullTreeDiagram v-else-if="currentPage === 'full'" class="page-container" />
 </div>
 </template>
 
 <script setup>
-import { reactive, ref, onMounted, nextTick } from 'vue';
+import { reactive, ref, onMounted, nextTick, watch } from 'vue';
 import * as d3 from 'd3';
+import TreeDiagram from './TreeDiagram.vue';
+import TransitionTree from './TransitionTree.vue';
+import FullTreeDiagram from './FullTreeDiagram.vue';
 
-// 定义 emit 事件
-const emit = defineEmits(['switchToHome', 'switchToTree', 'switchToTransition', 'switchToFull']);
+// 当前页面状态
+const currentPage = ref('home');
 
 const containerRef = ref(null);
 const d3Container = ref(null);
@@ -475,13 +482,26 @@ function drawVisualization() {
 // 组件挂载后绘制
 onMounted(() => {
   nextTick(() => {
-    setTimeout(drawVisualization, 100)
+    if (currentPage.value === 'home') {
+      setTimeout(drawVisualization, 100)
+    }
   })
   
   // 监听窗口大小变化
   window.addEventListener('resize', () => {
-    setTimeout(drawVisualization, 200)
+    if (currentPage.value === 'home') {
+      setTimeout(drawVisualization, 200)
+    }
   })
+})
+
+// 监听页面切换，当切换回主页时重新绘制
+watch(currentPage, (newPage) => {
+  if (newPage === 'home') {
+    nextTick(() => {
+      setTimeout(drawVisualization, 100)
+    })
+  }
 })
 
 </script>
@@ -500,6 +520,14 @@ onMounted(() => {
   flex: 1;
   width: 100%;
   overflow-y: auto;
+}
+
+/* 其他页面容器 */
+.page-container {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
 }
 
 /* 右上角按钮组样式 */
@@ -531,6 +559,13 @@ onMounted(() => {
 
 .nav-btn:active {
   transform: translateY(0);
+}
+
+/* 激活状态 */
+.nav-btn.active {
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25);
+  transform: translateY(-2px);
+  font-weight: 600;
 }
 
 /* 不同按钮的颜色 */

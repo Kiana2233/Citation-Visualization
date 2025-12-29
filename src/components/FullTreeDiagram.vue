@@ -1,15 +1,15 @@
 <template>
   <div class="tree-container">
-    <h2>全文树状图</h2>
+    <!-- <h2>全文树状图</h2> -->
     <div class="controls">
       <div class="zoom-controls">
         <button @click="zoomIn" class="control-btn">放大</button>
         <button @click="zoomOut" class="control-btn">缩小</button>
         <button @click="resetZoom" class="control-btn">重置</button>
       </div>
-      <div class="help-text">
+      <!-- <div class="help-text">
         💡 提示：可以用鼠标拖拽和滚轮缩放来浏览完整的树状图
-      </div>
+      </div> -->
     </div>
     <div class="tree-content">
       <div ref="treeContainer" class="d3-tree-container"></div>
@@ -360,30 +360,22 @@ onMounted(() => {
 
 .zoom-controls {
   display: flex;
-  gap: 12px;
+  gap: 10px;
 }
 
 .control-btn {
-  padding: 10px 18px;
-  background: linear-gradient(135deg, #4CAF50, #45a049);
+  padding: 8px 16px;
+  background: #4CAF50;
   color: white;
   border: none;
-  border-radius: 6px;
+  border-radius: 4px;
   cursor: pointer;
   font-size: 14px;
-  font-weight: 500;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  transition: background-color 0.3s;
 }
 
 .control-btn:hover {
-  background: linear-gradient(135deg, #45a049, #3d8b40);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-}
-
-.control-btn:active {
-  transform: translateY(0);
+  background: #45a049;
 }
 
 .help-text {

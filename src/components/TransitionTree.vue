@@ -1,15 +1,15 @@
 <template>
   <div class="transition-tree-container">
-    <h2>转折递进树图</h2>
+    <!-- <h2>转折递进树图</h2> -->
     <div class="controls">
       <div class="zoom-controls">
         <button @click="zoomIn" class="control-btn">放大</button>
         <button @click="zoomOut" class="control-btn">缩小</button>
         <button @click="resetZoom" class="control-btn">重置</button>
       </div>
-      <div class="help-text">
+      <!-- <div class="help-text">
         💡 提示：可以用鼠标拖拽和滚轮缩放来浏览完整的树状图
-      </div>
+      </div> -->
     </div>
     <div class="tree-content">
       <div ref="treeContainer" class="d3-tree-container"></div>
