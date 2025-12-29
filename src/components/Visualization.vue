@@ -1,15 +1,21 @@
 <template>  
 <div class="container" ref="containerRef">
-  <!-- 右上角按钮组 -->
-  <div class="top-right-buttons">
+  <!-- 右上角按钮组 -->  <div class="top-right-buttons">
     <button @click="currentPage = 'home'" class="nav-btn home-btn" :class="{ active: currentPage === 'home' }">主页</button>
     <button @click="currentPage = 'tree'" class="nav-btn tree-btn" :class="{ active: currentPage === 'tree' }">并列树图</button>
     <button @click="currentPage = 'transition'" class="nav-btn transition-btn" :class="{ active: currentPage === 'transition' }">转折递进树图</button>
     <button @click="currentPage = 'full'" class="nav-btn full-btn" :class="{ active: currentPage === 'full' }">全文展示图</button>
+    <button v-if="currentPage === 'home'" @click="clearHighlight" class="nav-btn clear-btn" title="清除高亮">清除高亮</button>
   </div>
-  
-  <!-- 根据当前页面显示不同内容 -->
-  <div v-if="currentPage === 'home'" ref="d3Container" class="d3-container"></div>
+    <!-- 根据当前页面显示不同内容 -->
+  <div v-if="currentPage === 'home'" class="home-page">
+    <!-- <div class="usage-tip" v-if="!tipDismissed">
+      <span class="tip-icon">💡</span>
+      <span class="tip-text">点击连线可以高亮文章中对应的引用文献</span>
+      <button class="dismiss-btn" @click="tipDismissed = true">×</button>
+    </div> -->
+    <div ref="d3Container" class="d3-container"></div>
+  </div>
   <TreeDiagram v-else-if="currentPage === 'tree'" class="page-container" />
   <TransitionTree v-else-if="currentPage === 'transition'" class="page-container" />
   <FullTreeDiagram v-else-if="currentPage === 'full'" class="page-container" />
@@ -17,17 +23,34 @@
 </template>
 
 <script setup>
-import { reactive, ref, onMounted, nextTick, watch } from 'vue';
+import { reactive, ref, onMounted, nextTick, watch, inject } from 'vue';
 import * as d3 from 'd3';
 import TreeDiagram from './TreeDiagram.vue';
 import TransitionTree from './TransitionTree.vue';
 import FullTreeDiagram from './FullTreeDiagram.vue';
+
+// 注入事件总线
+const emitter = inject('emitter');
 
 // 当前页面状态
 const currentPage = ref('home');
 
 const containerRef = ref(null);
 const d3Container = ref(null);
+
+// 提示信息状态
+const tipDismissed = ref(false);
+
+// 清除高亮的函数
+const clearHighlight = () => {
+  // 重置所有连线样式
+  d3.selectAll('path').style('stroke-width', 2).style('opacity', 1)
+  
+  // 发送清除高亮事件
+  if (emitter) {
+    emitter.emit('clear-highlight')
+  }
+}
 
 const references = reactive([
   {
@@ -460,8 +483,7 @@ function drawVisualization() {
     { from: 1, to: 57, color: 'green' },
     { from: 56, to: 57, color: 'green' },
   ]
-  
-  connections.forEach(conn => {
+    connections.forEach(conn => {
     const fromY = (conn.from - 1) * lineHeight + lineHeight / 2
     const toY = (conn.to - 1) * lineHeight + lineHeight / 2
     const midY = (fromY + toY) / 2
@@ -476,6 +498,29 @@ function drawVisualization() {
       .style('stroke', conn.color)
       .style('stroke-width', 2)
       .style('fill', 'none')
+      .style('cursor', 'pointer')
+      .on('click', function() {
+        // 高亮当前连线
+        d3.selectAll('path').style('stroke-width', 2).style('opacity', 0.6)
+        d3.select(this).style('stroke-width', 4).style('opacity', 1)
+        
+        // 发送事件到 PaperHTML 组件
+        if (emitter) {
+          emitter.emit('highlight-references', {
+            from: conn.from,
+            to: conn.to
+          })
+        }
+      })
+      .on('mouseenter', function() {
+        d3.select(this).style('stroke-width', 3)
+      })
+      .on('mouseleave', function() {
+        const isActive = d3.select(this).style('opacity') === '1'
+        if (!isActive) {
+          d3.select(this).style('stroke-width', 2)
+        }
+      })
   })
 }
 
@@ -516,6 +561,65 @@ watch(currentPage, (newPage) => {
 }
 
 /* D3 可视化容器 */
+.home-page {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.usage-tip {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 12px 20px;
+  margin: 10px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  animation: slideDown 0.5s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.tip-icon {
+  font-size: 20px;
+}
+
+.tip-text {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.dismiss-btn {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: white;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 1;
+  transition: all 0.3s ease;
+}
+
+.dismiss-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.1);
+}
+
 .d3-container {
   flex: 1;
   width: 100%;
@@ -599,5 +703,13 @@ watch(currentPage, (newPage) => {
 
 .full-btn:hover {
   background: linear-gradient(135deg, #45B7AF, #3DA199);
+}
+
+.clear-btn {
+  background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+}
+
+.clear-btn:hover {
+  background: linear-gradient(135deg, #7f8c8d, #6c7a7b);
 }
 </style>

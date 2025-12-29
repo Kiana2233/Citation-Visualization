@@ -739,12 +739,97 @@
 </template>
 
 <script>
+import { inject, onMounted, onBeforeUnmount } from 'vue';
+
 export default {
   name: 'CharityDonationHappinessResearch',
-  data() {
-    return {
-      // 可以在这里添加数据属性，如果需要交互功能的话
-    }
+  setup() {
+    const emitter = inject('emitter');    // 高亮引用的函数
+    const highlightReferences = ({ from, to }) => {
+      // 首先移除所有现有的高亮
+      document.querySelectorAll('.highlight-reference').forEach(el => {
+        el.classList.remove('highlight-reference');
+      });
+
+      // 创建包含两个ID的数组
+      const ids = [from, to].sort((a, b) => a - b);
+      
+      // 查找所有包含这些引用的 sup 标签
+      const supTags = document.querySelectorAll('sup');
+      
+      supTags.forEach(sup => {
+        const text = sup.textContent.trim();
+        
+        // 匹配单个引用 [数字]
+        const singleMatch = text.match(/^\[(\d+)\]$/);
+        if (singleMatch) {
+          const refId = parseInt(singleMatch[1]);
+          if (ids.includes(refId)) {
+            // 高亮包含该 sup 标签的父元素(通常是 p 标签)
+            const parent = sup.closest('p');
+            if (parent) {
+              parent.classList.add('highlight-reference');
+            }
+          }
+        }
+        
+        // 匹配范围引用 [数字-数字]
+        const rangeMatch = text.match(/^\[(\d+)-(\d+)\]$/);
+        if (rangeMatch) {
+          const start = parseInt(rangeMatch[1]);
+          const end = parseInt(rangeMatch[2]);
+          
+          // 检查范围内是否包含我们要高亮的ID
+          if (ids.some(id => id >= start && id <= end)) {
+            const parent = sup.closest('p');
+            if (parent) {
+              parent.classList.add('highlight-reference');
+            }
+          }
+        }
+        
+        // 匹配多个引用 [数字,数字,数字]
+        const multiMatch = text.match(/^\[(\d+(?:,\d+)*)\]$/);
+        if (multiMatch) {
+          const refIds = multiMatch[1].split(',').map(id => parseInt(id.trim()));
+          if (ids.some(id => refIds.includes(id))) {
+            const parent = sup.closest('p');
+            if (parent) {
+              parent.classList.add('highlight-reference');
+            }
+          }
+        }
+      });
+
+      // 滚动到第一个高亮的元素
+      const firstHighlight = document.querySelector('.highlight-reference');
+      if (firstHighlight) {
+        firstHighlight.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    };
+
+    // 清除高亮的函数
+    const clearHighlight = () => {
+      document.querySelectorAll('.highlight-reference').forEach(el => {
+        el.classList.remove('highlight-reference');
+      });
+    };
+
+    onMounted(() => {
+      if (emitter) {
+        emitter.on('highlight-references', highlightReferences);
+        emitter.on('clear-highlight', clearHighlight);
+      }
+    });
+
+    onBeforeUnmount(() => {
+      if (emitter) {
+        emitter.off('highlight-references', highlightReferences);
+        emitter.off('clear-highlight', clearHighlight);
+      }
+    });
+
+    return {};
   }
 }
 </script>
@@ -928,6 +1013,33 @@ th {
 sup {
   vertical-align: super;
   font-size: smaller;
+}
+
+/* 高亮引用的样式 */
+.highlight-reference {
+  background: linear-gradient(120deg, #ffeaa7 0%, #fdcb6e 100%);
+  padding: 8px 10px;
+  border-radius: 5px;
+  border-left: 4px solid #e17055;
+  margin: 5px 0;
+  transition: all 0.4s ease;
+  box-shadow: 0 2px 12px rgba(253, 203, 110, 0.6);
+  animation: highlight-pulse 0.6s ease-in-out;
+}
+
+@keyframes highlight-pulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 2px 12px rgba(253, 203, 110, 0.6);
+  }
+  50% {
+    transform: scale(1.02);
+    box-shadow: 0 4px 20px rgba(253, 203, 110, 0.8);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 2px 12px rgba(253, 203, 110, 0.6);
+  }
 }
 </style>
 
