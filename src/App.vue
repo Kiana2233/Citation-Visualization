@@ -76,12 +76,19 @@ body, html {
 /* 顶部栏样式 */
 .top-bar {
   flex-shrink: 0; /* 防止顶部栏在空间不足时被压缩 */
-  padding: 10px 20px;
+  padding: 5px 20px;
   background-color: #ffffff;
   border-bottom: 1px solid #dcdfe6;
   text-align: center;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   z-index: 10;
+}
+
+.title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
 }
 
 .top-bar span {

@@ -1,5 +1,8 @@
 <template>
-  <div ref="timelineContainer" class="timeline-container"></div>
+  <div class="timeline-wrapper">
+    <div class="header">参考文献时间线</div>
+    <div ref="timelineContainer" class="timeline-container"></div>
+  </div>
 </template>
 
 <script setup>
@@ -746,11 +749,27 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.timeline-container {
+.header {
+  border-bottom: 1px solid #ccc;
+  padding: 4px;
+  text-align: left;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.timeline-wrapper {
   width: 100%;
   height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.timeline-container {
+  flex: 1;
+  width: 100%;
   background: white;
   position: relative;
+  overflow: hidden;
 }
 
 :deep(.grid line) {

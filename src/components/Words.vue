@@ -1,5 +1,8 @@
 <template>
-  <div ref="containerRef" id="wordcloud"></div>
+  <div class="wordcloud-wrapper">
+    <div class="header">关键词云</div>
+    <div ref="containerRef" id="wordcloud"></div>
+  </div>
 </template>
 
 <script setup>
@@ -142,8 +145,24 @@ onMounted(() => {
 </script>
 
 <style scoped>
-#wordcloud {
+.header {
+  border-bottom: 1px solid #ccc;
+  padding: 4px;
+  text-align: left;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.wordcloud-wrapper {
   width: 100%;
   height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+#wordcloud {
+  flex: 1;
+  width: 100%;
+  overflow: hidden;
 }
 </style>

@@ -1,11 +1,13 @@
 <template>  
-<div class="container" ref="containerRef">
-  <!-- 右上角按钮组 -->  <div class="top-right-buttons">
-    <button @click="currentPage = 'home'" class="nav-btn home-btn" :class="{ active: currentPage === 'home' }">主页</button>
-    <button @click="currentPage = 'tree'" class="nav-btn tree-btn" :class="{ active: currentPage === 'tree' }">并列树图</button>
-    <button @click="currentPage = 'transition'" class="nav-btn transition-btn" :class="{ active: currentPage === 'transition' }">转折递进树图</button>
-    <button @click="currentPage = 'full'" class="nav-btn full-btn" :class="{ active: currentPage === 'full' }">全文展示图</button>
-    <button v-if="currentPage === 'home'" @click="clearHighlight" class="nav-btn clear-btn" title="清除高亮">清除高亮</button>
+<div class="container" ref="containerRef">  <div class="header">
+    <span class="header-title">引用关系可视化</span>
+    <!-- 右上角按钮组 -->
+    <div class="top-right-buttons">
+      <button @click="currentPage = 'home'" class="nav-btn home-btn" :class="{ active: currentPage === 'home' }">主页</button>
+      <button @click="currentPage = 'tree'" class="nav-btn tree-btn" :class="{ active: currentPage === 'tree' }">树图</button>
+      <button @click="currentPage = 'full'" class="nav-btn full-btn" :class="{ active: currentPage === 'full' }">全文展示图</button>
+      <button v-if="currentPage === 'home'" @click="clearHighlight" class="nav-btn clear-btn" title="清除高亮">清除高亮</button>
+    </div>
   </div>
     <!-- 根据当前页面显示不同内容 -->
   <div v-if="currentPage === 'home'" class="home-page">
@@ -13,11 +15,21 @@
       <span class="tip-icon">💡</span>
       <span class="tip-text">点击连线可以高亮文章中对应的引用文献</span>
       <button class="dismiss-btn" @click="tipDismissed = true">×</button>
-    </div> -->
-    <div ref="d3Container" class="d3-container"></div>
+    </div> -->    <div ref="d3Container" class="d3-container"></div>
   </div>
-  <TreeDiagram v-else-if="currentPage === 'tree'" class="page-container" />
-  <TransitionTree v-else-if="currentPage === 'transition'" class="page-container" />
+  
+  <!-- 合并的树图视图 -->
+  <div v-else-if="currentPage === 'tree'" class="combined-tree-page">
+    <div class="tree-section">
+      <div class="section-header">并列树图</div>
+      <TreeDiagram class="tree-component" />
+    </div>
+    <div class="tree-section">
+      <div class="section-header">转折递进树图</div>
+      <TransitionTree class="tree-component" />
+    </div>
+  </div>
+  
   <FullTreeDiagram v-else-if="currentPage === 'full'" class="page-container" />
 </div>
 </template>
@@ -498,8 +510,7 @@ function drawVisualization() {
       .style('stroke', conn.color)
       .style('stroke-width', 2)
       .style('fill', 'none')
-      .style('cursor', 'pointer')
-      .on('click', function() {
+      .style('cursor', 'pointer')      .on('click', function() {
         // 高亮当前连线
         d3.selectAll('path').style('stroke-width', 2).style('opacity', 0.6)
         d3.select(this).style('stroke-width', 4).style('opacity', 1)
@@ -507,8 +518,7 @@ function drawVisualization() {
         // 发送事件到 PaperHTML 组件
         if (emitter) {
           emitter.emit('highlight-references', {
-            from: conn.from,
-            to: conn.to
+            ids: [conn.from, conn.to]
           })
         }
       })
@@ -552,6 +562,20 @@ watch(currentPage, (newPage) => {
 </script>
 
 <style scoped>
+.header {
+  border-bottom: 1px solid #ccc;
+  padding: 4px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.header-title {
+  flex-shrink: 0;
+}
+
 .container {
   width: 100%;
   height: 100%;
@@ -634,14 +658,44 @@ watch(currentPage, (newPage) => {
   overflow: auto;
 }
 
+/* 合并的树图页面样式 */
+.combined-tree-page {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  overflow: hidden;
+}
+
+.tree-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #dcdfe6;
+  border-radius: 8px;
+  background-color: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+}
+
+.section-header {
+  border-bottom: 1px solid #ccc;
+  padding: 8px 12px;
+  font-size: 14px;
+  font-weight: bold;
+  background-color: #f8f9fa;
+}
+
+.tree-component {
+  flex: 1;
+  overflow: hidden;
+}
+
 /* 右上角按钮组样式 */
 .top-right-buttons {
-  position: absolute;
-  top: 10px;
-  right: 10px;
   display: flex;
   gap: 8px;
-  z-index: 1000; /* 确保按钮在最上层 */
 }
 
 .nav-btn {
@@ -687,14 +741,6 @@ watch(currentPage, (newPage) => {
 
 .tree-btn:hover {
   background: linear-gradient(135deg, #45a049, #3d8b40);
-}
-
-.transition-btn {
-  background: linear-gradient(135deg, #FF6B6B, #E55353);
-}
-
-.transition-btn:hover {
-  background: linear-gradient(135deg, #E55353, #D44545);
 }
 
 .full-btn {

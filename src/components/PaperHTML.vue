@@ -1,5 +1,6 @@
 <template>
   <div class="paper-container">
+    <div class="header">论文内容</div>
     <div class="research-paper">
     <header class="paper-header">
       <h1 class="title">慈善捐赠行为对居民主观幸福感的影响研究</h1>
@@ -744,74 +745,100 @@ import { inject, onMounted, onBeforeUnmount } from 'vue';
 export default {
   name: 'CharityDonationHappinessResearch',
   setup() {
-    const emitter = inject('emitter');    // 高亮引用的函数
-    const highlightReferences = ({ from, to }) => {
-      // 首先移除所有现有的高亮
-      document.querySelectorAll('.highlight-reference').forEach(el => {
-        el.classList.remove('highlight-reference');
-      });
-
-      // 创建包含两个ID的数组
-      const ids = [from, to].sort((a, b) => a - b);
+    const emitter = inject('emitter');
+    
+    // 保存原始HTML内容
+        // 新思路：使用 DOM 操作而不是正则表达式来高亮引用句子
+    const highlightReferences = ({ ids }) => {
+      console.log('高亮引用:', ids);
       
-      // 查找所有包含这些引用的 sup 标签
-      const supTags = document.querySelectorAll('sup');
+      // 首先清除所有高亮
+      clearHighlight();
       
-      supTags.forEach(sup => {
-        const text = sup.textContent.trim();
-        
-        // 匹配单个引用 [数字]
-        const singleMatch = text.match(/^\[(\d+)\]$/);
-        if (singleMatch) {
-          const refId = parseInt(singleMatch[1]);
-          if (ids.includes(refId)) {
-            // 高亮包含该 sup 标签的父元素(通常是 p 标签)
-            const parent = sup.closest('p');
-            if (parent) {
-              parent.classList.add('highlight-reference');
-            }
-          }
-        }
-        
-        // 匹配范围引用 [数字-数字]
-        const rangeMatch = text.match(/^\[(\d+)-(\d+)\]$/);
-        if (rangeMatch) {
-          const start = parseInt(rangeMatch[1]);
-          const end = parseInt(rangeMatch[2]);
-          
-          // 检查范围内是否包含我们要高亮的ID
-          if (ids.some(id => id >= start && id <= end)) {
-            const parent = sup.closest('p');
-            if (parent) {
-              parent.classList.add('highlight-reference');
-            }
-          }
-        }
-        
-        // 匹配多个引用 [数字,数字,数字]
-        const multiMatch = text.match(/^\[(\d+(?:,\d+)*)\]$/);
-        if (multiMatch) {
-          const refIds = multiMatch[1].split(',').map(id => parseInt(id.trim()));
-          if (ids.some(id => refIds.includes(id))) {
-            const parent = sup.closest('p');
-            if (parent) {
-              parent.classList.add('highlight-reference');
-            }
-          }
-        }
-      });
-
-      // 滚动到第一个高亮的元素
-      const firstHighlight = document.querySelector('.highlight-reference');
-      if (firstHighlight) {
-        firstHighlight.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      if (!ids || ids.length === 0) {
+        return;
       }
-    };
-
-    // 清除高亮的函数
+      
+      // 查找所有段落
+      const paragraphs = document.querySelectorAll('.research-paper p');
+      
+      paragraphs.forEach((paragraph) => {
+        // 查找段落中的所有 sup 标签
+        const supTags = paragraph.querySelectorAll('sup');
+        
+        supTags.forEach(sup => {
+          const text = sup.textContent.trim();
+          let shouldHighlight = false;
+          
+          // 匹配单个引用 [数字]
+          const singleMatch = text.match(/^\[(\d+)\]$/);
+          if (singleMatch) {
+            const refId = parseInt(singleMatch[1]);
+            if (ids.includes(refId)) {
+              shouldHighlight = true;
+            }
+          }
+          
+          // 匹配范围引用 [数字-数字]
+          const rangeMatch = text.match(/^\[(\d+)-(\d+)\]$/);
+          if (rangeMatch) {
+            const start = parseInt(rangeMatch[1]);
+            const end = parseInt(rangeMatch[2]);
+            if (ids.some(id => id >= start && id <= end)) {
+              shouldHighlight = true;
+            }
+          }
+          
+          // 匹配多个引用 [数字,数字,数字]
+          const multiMatch = text.match(/^\[(\d+(?:,\d+)*)\]$/);
+          if (multiMatch) {
+            const refIds = multiMatch[1].split(',').map(id => parseInt(id.trim()));
+            if (ids.some(id => refIds.includes(id))) {
+              shouldHighlight = true;
+            }
+          }
+          
+          if (shouldHighlight) {
+            console.log('找到匹配的引用:', text);
+            // 使用更简单的方法：找到包含 sup 的整个句子
+            highlightSentenceContaining(sup);
+          }
+        });
+      });      // 滚动到第一个高亮的元素
+      setTimeout(() => {
+        const firstHighlight = document.querySelector('.highlight-ref');
+        if (firstHighlight) {
+          console.log('滚动到高亮位置');
+          firstHighlight.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 100);
+    };    // 高亮包含指定 sup 元素的段落
+    const highlightSentenceContaining = (element) => {
+      const paragraph = element.closest('p');
+      if (!paragraph) {
+        console.log('未找到所属段落');
+        return;
+      }
+      
+      // 添加 CSS 类来高亮 sup 元素和段落
+      element.classList.add('highlight-ref');
+      paragraph.classList.add('has-highlight');
+      
+      console.log('已添加高亮类');
+    };    // 清除高亮的函数
     const clearHighlight = () => {
-      document.querySelectorAll('.highlight-reference').forEach(el => {
-        el.classList.remove('highlight-reference');
+      console.log('清除所有高亮');
+      
+      // 移除所有高亮的引用标记
+      const highlightedRefs = document.querySelectorAll('.highlight-ref');
+      highlightedRefs.forEach(ref => {
+        ref.classList.remove('highlight-ref');
+      });
+      
+      // 移除所有段落的高亮背景
+      const highlightedParagraphs = document.querySelectorAll('.research-paper p.has-highlight');
+      highlightedParagraphs.forEach(p => {
+        p.classList.remove('has-highlight');
       });
     };
 
@@ -834,6 +861,14 @@ export default {
 }
 </script>
 <style scoped>
+.header {
+  border-bottom: 1px solid #ccc;
+  padding: 4px;
+  text-align: left;
+  font-size: 16px;
+  font-weight: bold;
+}
+
 .paper-container {
   width: 100%;
   height: 100%;
@@ -1015,31 +1050,50 @@ sup {
   font-size: smaller;
 }
 
-/* 高亮引用的样式 */
-.highlight-reference {
-  background: linear-gradient(120deg, #ffeaa7 0%, #fdcb6e 100%);
-  padding: 8px 10px;
-  border-radius: 5px;
-  border-left: 4px solid #e17055;
-  margin: 5px 0;
-  transition: all 0.4s ease;
-  box-shadow: 0 2px 12px rgba(253, 203, 110, 0.6);
+/* 高亮引用的样式 - 新的简单方法 */
+.highlight-ref {
+  background: linear-gradient(120deg, #ff6b6b 0%, #ee5a6f 100%);
+  color: white;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: bold;
+  box-shadow: 0 2px 10px rgba(238, 90, 111, 0.5);
   animation: highlight-pulse 0.6s ease-in-out;
 }
 
+/* 包含高亮引用的段落背景高亮 */
+.research-paper p.has-highlight {
+  background: linear-gradient(120deg, rgba(255, 234, 167, 0.3) 0%, rgba(253, 203, 110, 0.3) 100%);
+  padding: 15px;
+  border-radius: 8px;
+  border-left: 4px solid #fdcb6e;
+  margin: 15px 0;
+  box-shadow: 0 2px 12px rgba(253, 203, 110, 0.3);
+  animation: paragraph-highlight 0.6s ease-in-out;
+  transition: all 0.3s ease;
+}
+
 @keyframes highlight-pulse {
-  0% {
+  0%, 100% {
     transform: scale(1);
-    box-shadow: 0 2px 12px rgba(253, 203, 110, 0.6);
+    box-shadow: 0 2px 10px rgba(238, 90, 111, 0.5);
   }
   50% {
-    transform: scale(1.02);
-    box-shadow: 0 4px 20px rgba(253, 203, 110, 0.8);
-  }
-  100% {
-    transform: scale(1);
-    box-shadow: 0 2px 12px rgba(253, 203, 110, 0.6);
+    transform: scale(1.1);
+    box-shadow: 0 4px 20px rgba(238, 90, 111, 0.8);
   }
 }
+
+@keyframes paragraph-highlight {
+  0% {
+    background: transparent;
+    box-shadow: none;
+  }
+  100% {
+    background: linear-gradient(120deg, rgba(255, 234, 167, 0.3) 0%, rgba(253, 203, 110, 0.3) 100%);
+    box-shadow: 0 2px 12px rgba(253, 203, 110, 0.3);
+  }
+}
+
 </style>
 
