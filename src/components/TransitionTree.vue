@@ -1,9 +1,6 @@
 <template>
   <div class="transition-tree-container">
-    <!-- <h2>转折递进树图</h2> -->
-    <div class="tree-content">
-      <div ref="treeContainer" class="d3-tree-container"></div>
-    </div>
+    <div ref="svgContainer" class="d3-tree-container"></div>
   </div>
 </template>
 
@@ -11,9 +8,7 @@
 import { ref, onMounted } from "vue"
 import * as d3 from "d3"
 
-const treeContainer = ref(null)
-let zoomBehavior = null
-let svgElement = null
+const svgContainer = ref(null)
 
 // 上方树的数据结构
 const upperTreeData = {
@@ -120,123 +115,123 @@ const lowerTreeData = {
 }
 
 const drawTree = () => {
-  const container = treeContainer.value
+  const container = svgContainer.value
   if (!container) return
 
-  // 清空容器
   d3.select(container).selectAll("*").remove()
 
-  const containerWidth = container.clientWidth || 800
+  const containerWidth  = container.clientWidth  || 800
   const containerHeight = container.clientHeight || 600
-  
-  const margin = { top: 50, right: 200, bottom: 50, left: 200 }
-  
-  // 创建可缩放的SVG容器
+
   const svg = d3.select(container)
     .append("svg")
     .attr("width", containerWidth)
     .attr("height", containerHeight)
-    .style("border", "1px solid #ddd")
     .style("cursor", "grab")
 
-  // 添加缩放功能
-  const zoom = d3.zoom()
-    .scaleExtent([0.1, 3])
-    .on("zoom", (event) => {
-      g.attr("transform", event.transform)
-    })
-
-  svg.call(zoom)
-  
-  // 保存缩放行为和SVG元素的引用
-  zoomBehavior = zoom
-  svgElement = svg
-
-  // 添加鼠标按下时的抓取效果
-  svg.on("mousedown", () => {
-    svg.style("cursor", "grabbing")
-  })
-  svg.on("mouseup", () => {
-    svg.style("cursor", "grab")
-  })
-
   const g = svg.append("g")
-    .attr("transform", `translate(${margin.left},${margin.top})`)
 
-  // 绘制上方的树
-  drawSingleTree(g, upperTreeData, 50, "#FF6B6B", "上")
-  
-  // 绘制下方的树  
-  drawSingleTree(g, lowerTreeData, containerHeight - 400, "#4ECDC4", "下")
-}
+  const zoom = d3.zoom()
+    .scaleExtent([0.2, 3])
+    .on("zoom", (event) => g.attr("transform", event.transform))
+  svg.call(zoom)
+  svg.on("mousedown", () => svg.style("cursor", "grabbing"))
+  svg.on("mouseup",   () => svg.style("cursor", "grab"))
 
-const drawSingleTree = (parentGroup, treeData, yOffset, color, position) => {
-  // 创建树布局 - 使用更大的尺寸，参考TreeDiagram.vue
-  const treeWidth = 800
-  const treeHeight = 300
-  
-  const tree = d3.tree()
-    .size([treeHeight, treeWidth])
+  // ── 计算两棵树的布局 ──────────────────────────────────────
+  const buildLayout = (treeData) => {
+    const tree = d3.tree().nodeSize([26, 150])
+    const root = d3.hierarchy(treeData)
+    tree(root)
+    let x0 = Infinity, x1 = -Infinity
+    root.each(d => { if (d.x < x0) x0 = d.x; if (d.x > x1) x1 = d.x })
+    return { root, x0, x1 }
+  }
 
-  // 处理数据
-  const root = d3.hierarchy(treeData)
-  const treeLayout = tree(root)
-  // 创建组用于放置这棵树
-  const treeGroup = parentGroup.append("g")
-    .attr("transform", `translate(0, ${yOffset})`)
-  // 绘制连线
-  treeGroup.selectAll(".link")
-    .data(treeLayout.links())
-    .enter().append("path")
-    .attr("class", "link")
-    .attr("d", d3.linkHorizontal()
-      .x(d => d.y)
-      .y(d => d.x))
-    .style("fill", "none")
-    .style("stroke", color)
-    .style("stroke-width", "2px")
-    .style("opacity", 0.7)
+  const upper = buildLayout(upperTreeData)
+  const lower = buildLayout(lowerTreeData)
 
-  // 创建节点组
-  const node = treeGroup.selectAll(".node")
-    .data(treeLayout.descendants())
-    .enter().append("g")
-    .attr("class", "node")
-    .attr("transform", d => `translate(${d.y},${d.x})`)
+  const GAP = 40  // 两棵树之间的间距（像素，在树坐标系中）
+  const margin = { top: 40, right: 150, bottom: 40, left: 100 }
 
-  // 绘制节点圆圈
-  node.append("circle")
-    .attr("r", 6)
-    .style("fill", d => d.children ? color : d3.color(color).darker(0.5))
-    .style("stroke", "#fff")
-    .style("stroke-width", "2px")
+  // 上树高度
+  const upperH = upper.x1 - upper.x0
+  // 下树起始 y 偏移（在树坐标系中）
+  const lowerOffsetY = upper.x1 + GAP - lower.x0
 
-  // 添加节点文本
-  node.append("text")
-    .attr("dy", ".35em")
-    .attr("x", d => d.children ? -10 : 10)
-    .style("text-anchor", d => d.children ? "end" : "start")
-    .style("font-size", "12px")
-    .style("font-family", "Arial, sans-serif")
-    .style("fill", "#333")
-    .style("font-weight", d => d.depth < 2 ? "bold" : "normal")
-    .text(d => d.data.name)
+  // 所有节点的最大深度（取两棵树中较大者）
+  const maxDepth = Math.max(upper.root.height, lower.root.height)
+  const totalW = maxDepth * 150
+  const totalH = upperH + GAP + (lower.x1 - lower.x0)
 
-  // 添加鼠标悬停效果
-  node.on("mouseover", function(event, d) {
-    d3.select(this).select("circle")
-      .transition()
-      .duration(200)
-      .attr("r", 8)
-      .style("fill", "#FF9800")
-  })
-  .on("mouseout", function(event, d) {
-    d3.select(this).select("circle")
-      .transition()
-      .duration(200)
+  // 计算初始缩放让整体适配容器
+  const scaleX = (containerWidth  - margin.left - margin.right)  / totalW
+  const scaleY = (containerHeight - margin.top  - margin.bottom) / totalH
+  const scale  = Math.min(scaleX, scaleY, 1)
+
+  const initX = margin.left
+  const initY = margin.top - upper.x0 * scale
+
+  svg.call(zoom.transform, d3.zoomIdentity.translate(initX, initY).scale(scale))
+
+  // ── 分隔线（在两棵树中间） ─────────────────────────────────
+  const sepY = upper.x1 + GAP / 2
+  g.append("line")
+    .attr("x1", -20).attr("x2", totalW + 20)
+    .attr("y1", sepY).attr("y2", sepY)
+    .style("stroke", "#ccc")
+    .style("stroke-width", "1.5px")
+    .style("stroke-dasharray", "6,4")
+
+  // ── 绘制单棵树 ────────────────────────────────────────────
+  const renderTree = (root, yOffset, color) => {
+    const tg = g.append("g").attr("transform", `translate(0, ${yOffset})`)
+
+    tg.selectAll(".link")
+      .data(root.links())
+      .enter().append("path")
+      .attr("class", "link")
+      .attr("d", d3.linkHorizontal().x(d => d.y).y(d => d.x))
+      .style("fill", "none")
+      .style("stroke", color)
+      .style("stroke-width", "2px")
+      .style("opacity", 0.7)
+
+    const node = tg.selectAll(".node")
+      .data(root.descendants())
+      .enter().append("g")
+      .attr("class", "node")
+      .attr("transform", d => `translate(${d.y},${d.x})`)
+
+    node.append("circle")
       .attr("r", 6)
-      .style("fill", d.children ? color : d3.color(color).darker(0.5))
-  })
+      .style("fill", d => d.children ? color : d3.color(color).darker(0.5))
+      .style("stroke", "#fff")
+      .style("stroke-width", "2px")
+
+    node.append("text")
+      .attr("dy", ".35em")
+      .attr("x", d => d.children ? -10 : 10)
+      .style("text-anchor", d => d.children ? "end" : "start")
+      .style("font-size", "12px")
+      .style("font-family", "Arial, sans-serif")
+      .style("fill", "#333")
+      .style("font-weight", d => d.depth < 2 ? "bold" : "normal")
+      .text(d => d.data.name)
+
+    node.on("mouseover", function(event, d) {
+      d3.select(this).select("circle")
+        .transition().duration(200).attr("r", 8).style("fill", "#FF9800")
+    })
+    .on("mouseout", function(event, d) {
+      d3.select(this).select("circle")
+        .transition().duration(200).attr("r", 6)
+        .style("fill", d.children ? color : d3.color(color).darker(0.5))
+    })
+  }
+
+  renderTree(upper.root, 0,             "#FF6B6B")
+  renderTree(lower.root, lowerOffsetY,  "#4ECDC4")
 }
 
 onMounted(() => {
@@ -255,39 +250,20 @@ onMounted(() => {
   height: 100%;
   display: flex;
   flex-direction: column;
-}
-
-.transition-tree-container h2 {
-  margin: 0 0 10px 0;
-  color: #333;
-  font-size: 24px;
-  text-align: center;
-}
-
-.tree-content {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  position: relative;
+  box-sizing: border-box;
 }
 
 .d3-tree-container {
+  flex: 1;
   width: 100%;
-  height: 100%;
   background-color: #fff;
   border-radius: 8px;
   border: 1px solid #e0e0e0;
   overflow: hidden;
-  position: relative;
   cursor: grab;
 }
 
 .d3-tree-container:active {
   cursor: grabbing;
-}
-
-.d3-tree-container svg {
-  display: block;
 }
 </style>

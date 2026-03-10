@@ -1,16 +1,5 @@
-<template>
-  <div class="tree-container">
+<template>  <div class="tree-container">
     <!-- <h2>全文树状图</h2> -->
-    <div class="controls">
-      <div class="zoom-controls">
-        <button @click="zoomIn" class="control-btn">放大</button>
-        <button @click="zoomOut" class="control-btn">缩小</button>
-        <button @click="resetZoom" class="control-btn">重置</button>
-      </div>
-      <!-- <div class="help-text">
-        💡 提示：可以用鼠标拖拽和滚轮缩放来浏览完整的树状图
-      </div> -->
-    </div>
     <div class="tree-content">
       <div ref="treeContainer" class="d3-tree-container"></div>
     </div>
@@ -24,32 +13,6 @@ import * as d3 from "d3"
 const treeContainer = ref(null)
 let zoomBehavior = null
 let svgElement = null
-
-// 缩放控制方法
-const zoomIn = () => {
-  if (zoomBehavior && svgElement) {
-    svgElement.transition().duration(300).call(
-      zoomBehavior.scaleBy, 1.5
-    )
-  }
-}
-
-const zoomOut = () => {
-  if (zoomBehavior && svgElement) {
-    svgElement.transition().duration(300).call(
-      zoomBehavior.scaleBy, 1 / 1.5
-    )
-  }
-}
-
-const resetZoom = () => {
-  if (zoomBehavior && svgElement) {
-    svgElement.transition().duration(500).call(
-      zoomBehavior.transform,
-      d3.zoomIdentity
-    )
-  }
-}
 
 // 示例树状数据
 const treeData = {
@@ -345,47 +308,6 @@ onMounted(() => {
   font-size: 26px;
   text-align: center;
   font-weight: 600;
-}
-
-.controls {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-  padding: 0 20px;
-  background: #f8f9fa;
-  border-radius: 8px;
-  padding: 15px 20px;
-}
-
-.zoom-controls {
-  display: flex;
-  gap: 10px;
-}
-
-.control-btn {
-  padding: 8px 16px;
-  background: #4CAF50;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 14px;
-  transition: background-color 0.3s;
-}
-
-.control-btn:hover {
-  background: #45a049;
-}
-
-.help-text {
-  color: #666;
-  font-size: 14px;
-  font-style: italic;
-  background: #fff;
-  padding: 8px 12px;
-  border-radius: 4px;
-  border-left: 4px solid #4CAF50;
 }
 
 .tree-content {
