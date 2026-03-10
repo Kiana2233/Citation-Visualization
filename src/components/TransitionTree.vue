@@ -7,6 +7,7 @@
 <script setup>
 import { ref, onMounted } from "vue"
 import * as d3 from "d3"
+import { refTitleMap } from "../data/references.js"
 
 const svgContainer = ref(null)
 
@@ -217,7 +218,13 @@ const drawTree = () => {
       .style("font-family", "Arial, sans-serif")
       .style("fill", "#333")
       .style("font-weight", d => d.depth < 2 ? "bold" : "normal")
-      .text(d => d.data.name)
+      .text(d => {
+        const id = parseInt(d.data.name)
+        if (!isNaN(id) && !d.children && refTitleMap[id]) {
+          return `[${id}]${refTitleMap[id]}`
+        }
+        return d.data.name
+      })
 
     node.on("mouseover", function(event, d) {
       d3.select(this).select("circle")
