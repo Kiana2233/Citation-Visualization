@@ -1,5 +1,8 @@
 <template>
-  <div ref="containerRef" id="wordcloud"></div>
+  <div class="wordcloud-wrapper">
+    <div class="header">关键词云</div>
+    <div ref="containerRef" id="wordcloud"></div>
+  </div>
 </template>
 
 <script setup>
@@ -12,54 +15,43 @@ const containerRef = ref(null)
 
 const keywords = [
   // 核心变量（最大字号）
-  { text: "慈善捐赠", size: 40 },
-  { text: "主观幸福感", size: 36 },
-  
-  // 关键机制（较大字号）
-  { text: "温情效应", size: 28 },
-  { text: "社会关联能力", size: 26 },
-  { text: "社会地位", size: 24 },
-  { text: "积极情绪", size: 22 },
-  { text: "非纯利他动机", size: 20 },
-  
-  // 重要发现（中等字号）
-  { text: "CFPS数据", size: 19 },
-  { text: "城镇人群", size: 18 },
-  { text: "低学历群体", size: 18 },
-  { text: "收入门槛效应", size: 17 },
-  { text: "高收入满意度", size: 16 },
-  { text: "集体主义文化", size: 15 },
-  
-  // 分析方法（中等偏小）
-  { text: "倾向得分匹配", size: 14 },
-  { text: "中介效应", size: 14 },
-  { text: "异质性分析", size: 13 },
-  { text: "稳健性检验", size: 12 },
-  
-  // 次级变量（较小字号）
-  { text: "社会资本", size: 11 },
-  { text: "社会网络", size: 11 },
-  { text: "下行比较", size: 10 },
-  { text: "利他主义", size: 10 },
-  { text: "中年效应", size: 9 },
-  
-  // 政策相关（最小字号）
-  { text: "共同富裕", size: 8 },
-  { text: "慈善组织", size: 8 },
-  { text: "监管引导", size: 7 },
-  { text: "微观经济效应", size: 7 }
-];
+  { text: "慈善捐赠",    size: 40, color: '#FF6B6B', rotate: 0   },
+  { text: "主观幸福感",  size: 36, color: '#45B7D1', rotate: 0   },
 
-// 随机颜色生成函数
-function getRandomColor() {
-  const colors = [
-    '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7',
-    '#DDA0DD', '#FFB6C1', '#87CEEB', '#F0E68C', '#FFE4B5',
-    '#FFA07A', '#20B2AA', '#87CEFA', '#F4A460', '#98FB98',
-    '#F5DEB3', '#FF69B4', '#00CED1', '#FFD700', '#FF7F50'
-  ]
-  return colors[Math.floor(Math.random() * colors.length)]
-}
+  // 关键机制（较大字号）
+  { text: "温情效应",    size: 28, color: '#4ECDC4', rotate: 0   },
+  { text: "社会关联能力",size: 26, color: '#DDA0DD', rotate: 90  },
+  { text: "社会地位",    size: 24, color: '#FFD700', rotate: 0   },
+  { text: "积极情绪",    size: 22, color: '#FF7F50', rotate: 90  },
+  { text: "非纯利他动机",size: 20, color: '#96CEB4', rotate: 0   },
+
+  // 重要发现（中等字号）
+  { text: "CFPS数据",    size: 19, color: '#87CEEB', rotate: 0   },
+  { text: "城镇人群",    size: 18, color: '#FFA07A', rotate: 90  },
+  { text: "低学历群体",  size: 18, color: '#20B2AA', rotate: 0   },
+  { text: "收入门槛效应",size: 17, color: '#FFB6C1', rotate: 90  },
+  { text: "高收入满意度",size: 16, color: '#F4A460', rotate: 0   },
+  { text: "集体主义文化",size: 15, color: '#98FB98', rotate: 0   },
+
+  // 分析方法（中等偏小）
+  { text: "倾向得分匹配",size: 14, color: '#00CED1', rotate: 90  },
+  { text: "中介效应",    size: 14, color: '#FF69B4', rotate: 0   },
+  { text: "异质性分析",  size: 13, color: '#87CEFA', rotate: 0   },
+  { text: "稳健性检验",  size: 12, color: '#F0E68C', rotate: 90  },
+
+  // 次级变量（较小字号）
+  { text: "社会资本",    size: 11, color: '#FFEAA7', rotate: 0   },
+  { text: "社会网络",    size: 11, color: '#DDA0DD', rotate: 90  },
+  { text: "下行比较",    size: 10, color: '#4ECDC4', rotate: 0   },
+  { text: "利他主义",    size: 10, color: '#FF6B6B', rotate: 90  },
+  { text: "中年效应",    size:  9, color: '#45B7D1', rotate: 0   },
+
+  // 政策相关（最小字号）
+  { text: "共同富裕",    size:  8, color: '#96CEB4', rotate: 0   },
+  { text: "慈善组织",    size:  8, color: '#FFE4B5', rotate: 90  },
+  { text: "监管引导",    size:  7, color: '#F5DEB3', rotate: 0   },
+  { text: "微观经济效应",size:  7, color: '#20B2AA', rotate: 90  }
+];
 
 // 词云图绘制函数
 function drawWordCloud() {
@@ -90,11 +82,12 @@ function drawWordCloud() {
     .size([width, height])
     .words(keywords.map(d => ({
       text: d.text,
-      size: Math.max(8, d.size * scaleFactor), // 动态缩放字体大小，最小8px
-      color: getRandomColor()
+      size: Math.max(8, d.size * scaleFactor),
+      color: d.color,
+      rotate: d.rotate
     })))
-    .padding(1) // 最小间距确保不重叠
-    .rotate(() => ~~(Math.random() * 2) * 90) // 水平或垂直
+    .padding(1)
+    .rotate(d => d.rotate)
     .font('Microsoft YaHei, sans-serif')
     .fontSize(d => d.size)
     .spiral('archimedean') // 阿基米德螺旋
@@ -142,8 +135,24 @@ onMounted(() => {
 </script>
 
 <style scoped>
-#wordcloud {
+.header {
+  border-bottom: 1px solid #ccc;
+  padding: 4px;
+  text-align: left;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.wordcloud-wrapper {
   width: 100%;
   height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+#wordcloud {
+  flex: 1;
+  width: 100%;
+  overflow: hidden;
 }
 </style>
