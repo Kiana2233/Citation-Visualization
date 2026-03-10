@@ -1,12 +1,29 @@
 <template>  
 <div class="container" ref="containerRef">  <div class="header">
     <span class="header-title">引用关系可视化</span>
-    <!-- 右上角按钮组 -->
-    <div class="top-right-buttons">
-      <button @click="currentPage = 'home'" class="nav-btn home-btn" :class="{ active: currentPage === 'home' }">主页</button>
-      <button @click="currentPage = 'tree'" class="nav-btn tree-btn" :class="{ active: currentPage === 'tree' }">树图</button>
-      <button @click="currentPage = 'full'" class="nav-btn full-btn" :class="{ active: currentPage === 'full' }">全文展示图</button>
-      <button v-if="currentPage === 'home'" @click="clearHighlight" class="nav-btn clear-btn" title="清除高亮">清除高亮</button>
+    <!-- 右上角按钮组 -->    <div class="header-right">
+      <!-- 图例 -->
+      <div class="legend" v-if="currentPage === 'home'">
+        <span class="legend-item">
+          <svg width="24" height="10"><line x1="0" y1="5" x2="24" y2="5" stroke="#4A90D9" stroke-width="2.5"/></svg>
+          <span>并列</span>
+        </span>
+        <span class="legend-item">
+          <svg width="24" height="10"><line x1="0" y1="5" x2="24" y2="5" stroke="#E8734A" stroke-width="2.5"/></svg>
+          <span>转折</span>
+        </span>
+        <span class="legend-item">
+          <svg width="24" height="10"><line x1="0" y1="5" x2="24" y2="5" stroke="#67C23A" stroke-width="2.5"/></svg>
+          <span>递进</span>
+        </span>
+      </div>
+      <!-- 按钮组 -->
+      <div class="top-right-buttons">
+        <button @click="currentPage = 'home'" class="nav-btn home-btn" :class="{ active: currentPage === 'home' }">主页</button>
+        <button @click="currentPage = 'tree'" class="nav-btn tree-btn" :class="{ active: currentPage === 'tree' }">树图</button>
+        <button @click="currentPage = 'full'" class="nav-btn full-btn" :class="{ active: currentPage === 'full' }">全文展示图</button>
+        <button v-if="currentPage === 'home'" @click="clearHighlight" class="nav-btn clear-btn" title="清除高亮">清除高亮</button>
+      </div>
     </div>
   </div>
     <!-- 根据当前页面显示不同内容 -->
@@ -348,152 +365,153 @@ function drawVisualization() {
   items.append('circle')
     .attr('cx', 120) // 减小距离，从160改为120
     .attr('cy', lineHeight / 2)
-    .attr('r', 3)
-    .style('fill', 'black')
-    .attr('id', d => `dot-${d.id}`)  // 添加半圆线连接指定的ID
+    .attr('r', 3)    .style('fill', 'black')
+    .attr('id', d => `dot-${d.id}`)
+
+  // 添加半圆线连接指定的ID
   const connections = [
-    { from: 1, to: 3, color: 'red' },
-    { from: 2, to: 3, color: 'red' },
-    // 1,4,5,6,7,8之间的绿色两两连线
-    { from: 1, to: 4, color: 'green' },
-    { from: 1, to: 5, color: 'green' },
-    { from: 1, to: 6, color: 'green' },
-    { from: 1, to: 7, color: 'green' },
-    { from: 1, to: 8, color: 'green' },
-    { from: 4, to: 5, color: 'green' },
-    { from: 4, to: 6, color: 'green' },
-    { from: 4, to: 7, color: 'green' },
-    { from: 4, to: 8, color: 'green' },
-    { from: 5, to: 6, color: 'green' },
-    { from: 5, to: 7, color: 'green' },
-    { from: 5, to: 8, color: 'green' },
-    { from: 6, to: 7, color: 'green' },
-    { from: 6, to: 8, color: 'green' },
-    { from: 7, to: 8, color: 'green' },
-    // 9,10,11,12,13,3之间的绿色两两连线
-    { from: 9, to: 10, color: 'green' },
-    { from: 9, to: 11, color: 'green' },
-    { from: 9, to: 12, color: 'green' },
-    { from: 9, to: 13, color: 'green' },
-    { from: 9, to: 3, color: 'green' },
-    { from: 10, to: 11, color: 'green' },
-    { from: 10, to: 12, color: 'green' },
-    { from: 10, to: 13, color: 'green' },
-    { from: 10, to: 3, color: 'green' },
-    { from: 11, to: 12, color: 'green' },
-    { from: 11, to: 13, color: 'green' },
-    { from: 11, to: 3, color: 'green' },
-    { from: 12, to: 13, color: 'green' },
-    { from: 12, to: 3, color: 'green' },
-    { from: 13, to: 3, color: 'green' },
-    // 14,15,16,17,18,19,20,21,23之间的绿色两两连线
-    { from: 14, to: 15, color: 'green' },
-    { from: 14, to: 16, color: 'green' },
-    { from: 14, to: 17, color: 'green' },
-    { from: 14, to: 18, color: 'green' },
-    { from: 14, to: 19, color: 'green' },
-    { from: 14, to: 20, color: 'green' },
-    { from: 14, to: 21, color: 'green' },
-    { from: 14, to: 23, color: 'green' },
-    { from: 15, to: 16, color: 'green' },
-    { from: 15, to: 17, color: 'green' },
-    { from: 15, to: 18, color: 'green' },
-    { from: 15, to: 19, color: 'green' },
-    { from: 15, to: 20, color: 'green' },
-    { from: 15, to: 21, color: 'green' },
-    { from: 15, to: 23, color: 'green' },
-    { from: 16, to: 17, color: 'green' },
-    { from: 16, to: 18, color: 'green' },
-    { from: 16, to: 19, color: 'green' },
-    { from: 16, to: 20, color: 'green' },
-    { from: 16, to: 21, color: 'green' },
-    { from: 16, to: 23, color: 'green' },
-    { from: 17, to: 18, color: 'green' },
-    { from: 17, to: 19, color: 'green' },
-    { from: 17, to: 20, color: 'green' },
-    { from: 17, to: 21, color: 'green' },
-    { from: 17, to: 23, color: 'green' },
-    { from: 18, to: 19, color: 'green' },
-    { from: 18, to: 20, color: 'green' },
-    { from: 18, to: 21, color: 'green' },
-    { from: 18, to: 23, color: 'green' },
-    { from: 19, to: 20, color: 'green' },
-    { from: 19, to: 21, color: 'green' },
-    { from: 19, to: 23, color: 'green' },
-    { from: 20, to: 21, color: 'green' },
-    { from: 20, to: 23, color: 'green' },
-    { from: 21, to: 23, color: 'green' },
-    // 24,25,26,27之间的绿色两两连线
-    { from: 24, to: 25, color: 'green' },
-    { from: 24, to: 26, color: 'green' },
-    { from: 24, to: 27, color: 'green' },
-    { from: 25, to: 26, color: 'green' },
-    { from: 25, to: 27, color: 'green' },
-    { from: 26, to: 27, color: 'green' },
-    // 24,25,26的红两两连线
-    { from: 24, to: 25, color: 'red' },
-    { from: 24, to: 26, color: 'red' },
-    // 28,30,31,32,33,34之间的绿两两连线
-    { from: 28, to: 30, color: 'green' },
-    { from: 28, to: 31, color: 'green' },
-    { from: 28, to: 32, color: 'green' },
-    { from: 28, to: 33, color: 'green' },
-    { from: 28, to: 34, color: 'green' },
-    { from: 30, to: 31, color: 'green' },
-    { from: 30, to: 32, color: 'green' },
-    { from: 30, to: 33, color: 'green' },
-    { from: 30, to: 34, color: 'green' },
-    { from: 31, to: 32, color: 'green' },
-    { from: 31, to: 33, color: 'green' },
-    { from: 31, to: 34, color: 'green' },
-    { from: 32, to: 33, color: 'green' },
-    { from: 32, to: 34, color: 'green' },
-    { from: 33, to: 34, color: 'green' },
-    // 35,36,37之间用绿线两两连接
-    { from: 35, to: 36, color: 'green' },
-    { from: 35, to: 37, color: 'green' },
-    { from: 36, to: 37, color: 'green' },
-    // 10，38之间黄线连接
-    { from: 37, to: 10, color: 'orange' },
-    { from: 37, to: 38, color: 'orange' },
-    // 39，40，42之间绿线两两连接
-    { from: 39, to: 40, color: 'green' },
-    { from: 39, to: 42, color: 'green' },
-    { from: 40, to: 42, color: 'green' },
-    // 39，41，43两两用橙线连接
-    { from: 40, to: 39, color: 'orange' },
-    { from: 40, to: 41, color: 'orange' },
-    { from: 42, to: 43, color: 'orange' },
-    // 44，45，46之间用绿线两两连接
-    { from: 44, to: 45, color: 'green' },
-    { from: 44, to: 46, color: 'green' },
-    { from: 45, to: 46, color: 'green' },
-    // 49，47，48之间用绿线两两连接
-    { from: 49, to: 47, color: 'green' },
-    { from: 49, to: 48, color: 'green' },
-    { from: 47, to: 48, color: 'green' },
-    // 1，51之间用绿线连接
-    { from: 1, to: 51, color: 'green' },
-    // 50，52之间用橙线连接
-    { from: 48, to: 50, color: 'orange' },
-    { from: 49, to: 50, color: 'orange' },
-    { from: 51, to: 52, color: 'orange' },
-    { from: 1, to: 52, color: 'orange' },
-    // 57，58，59之间用橙线连接
-    { from: 57, to: 58, color: 'orange' },
-    { from: 57, to: 59, color: 'orange' },
-    { from: 58, to: 59, color: 'orange' },
-    // 53，55，1，56，57之间用绿线连接
-    { from: 53, to: 55, color: 'green' },
-    { from: 53, to: 1, color: 'green' },
-    { from: 53, to: 56, color: 'green' },
-    { from: 53, to: 57, color: 'green' },
-    { from: 55, to: 1, color: 'green' },
-    { from: 55, to: 56, color: 'green' },
-    { from: 55, to: 57, color: 'green' },
-    { from: 1, to: 56, color: 'green' },
-    { from: 1, to: 57, color: 'green' },
-    { from: 56, to: 57, color: 'green' },
+    { from: 1, to: 3, color: '#E8734A' },
+    { from: 2, to: 3, color: '#E8734A' },
+    // 1,4,5,6,7,8之间的并列连线（蓝色）
+    { from: 1, to: 4, color: '#4A90D9' },
+    { from: 1, to: 5, color: '#4A90D9' },
+    { from: 1, to: 6, color: '#4A90D9' },
+    { from: 1, to: 7, color: '#4A90D9' },
+    { from: 1, to: 8, color: '#4A90D9' },
+    { from: 4, to: 5, color: '#4A90D9' },
+    { from: 4, to: 6, color: '#4A90D9' },
+    { from: 4, to: 7, color: '#4A90D9' },
+    { from: 4, to: 8, color: '#4A90D9' },
+    { from: 5, to: 6, color: '#4A90D9' },
+    { from: 5, to: 7, color: '#4A90D9' },
+    { from: 5, to: 8, color: '#4A90D9' },
+    { from: 6, to: 7, color: '#4A90D9' },
+    { from: 6, to: 8, color: '#4A90D9' },
+    { from: 7, to: 8, color: '#4A90D9' },
+    // 9,10,11,12,13,3之间的并列连线（蓝色）
+    { from: 9, to: 10, color: '#4A90D9' },
+    { from: 9, to: 11, color: '#4A90D9' },
+    { from: 9, to: 12, color: '#4A90D9' },
+    { from: 9, to: 13, color: '#4A90D9' },
+    { from: 9, to: 3, color: '#4A90D9' },
+    { from: 10, to: 11, color: '#4A90D9' },
+    { from: 10, to: 12, color: '#4A90D9' },
+    { from: 10, to: 13, color: '#4A90D9' },
+    { from: 10, to: 3, color: '#4A90D9' },
+    { from: 11, to: 12, color: '#4A90D9' },
+    { from: 11, to: 13, color: '#4A90D9' },
+    { from: 11, to: 3, color: '#4A90D9' },
+    { from: 12, to: 13, color: '#4A90D9' },
+    { from: 12, to: 3, color: '#4A90D9' },
+    { from: 13, to: 3, color: '#4A90D9' },
+    // 14,15,16,17,18,19,20,21,23之间的并列连线（蓝色）
+    { from: 14, to: 15, color: '#4A90D9' },
+    { from: 14, to: 16, color: '#4A90D9' },
+    { from: 14, to: 17, color: '#4A90D9' },
+    { from: 14, to: 18, color: '#4A90D9' },
+    { from: 14, to: 19, color: '#4A90D9' },
+    { from: 14, to: 20, color: '#4A90D9' },
+    { from: 14, to: 21, color: '#4A90D9' },
+    { from: 14, to: 23, color: '#4A90D9' },
+    { from: 15, to: 16, color: '#4A90D9' },
+    { from: 15, to: 17, color: '#4A90D9' },
+    { from: 15, to: 18, color: '#4A90D9' },
+    { from: 15, to: 19, color: '#4A90D9' },
+    { from: 15, to: 20, color: '#4A90D9' },
+    { from: 15, to: 21, color: '#4A90D9' },
+    { from: 15, to: 23, color: '#4A90D9' },
+    { from: 16, to: 17, color: '#4A90D9' },
+    { from: 16, to: 18, color: '#4A90D9' },
+    { from: 16, to: 19, color: '#4A90D9' },
+    { from: 16, to: 20, color: '#4A90D9' },
+    { from: 16, to: 21, color: '#4A90D9' },
+    { from: 16, to: 23, color: '#4A90D9' },
+    { from: 17, to: 18, color: '#4A90D9' },
+    { from: 17, to: 19, color: '#4A90D9' },
+    { from: 17, to: 20, color: '#4A90D9' },
+    { from: 17, to: 21, color: '#4A90D9' },
+    { from: 17, to: 23, color: '#4A90D9' },
+    { from: 18, to: 19, color: '#4A90D9' },
+    { from: 18, to: 20, color: '#4A90D9' },
+    { from: 18, to: 21, color: '#4A90D9' },
+    { from: 18, to: 23, color: '#4A90D9' },
+    { from: 19, to: 20, color: '#4A90D9' },
+    { from: 19, to: 21, color: '#4A90D9' },
+    { from: 19, to: 23, color: '#4A90D9' },
+    { from: 20, to: 21, color: '#4A90D9' },
+    { from: 20, to: 23, color: '#4A90D9' },
+    { from: 21, to: 23, color: '#4A90D9' },
+    // 24,25,26,27之间的并列连线（蓝色）
+    { from: 24, to: 25, color: '#4A90D9' },
+    { from: 24, to: 26, color: '#4A90D9' },
+    { from: 24, to: 27, color: '#4A90D9' },
+    { from: 25, to: 26, color: '#4A90D9' },
+    { from: 25, to: 27, color: '#4A90D9' },
+    { from: 26, to: 27, color: '#4A90D9' },
+    // 24,25,26的转折连线（暖橙红）
+    { from: 24, to: 25, color: '#E8734A' },
+    { from: 24, to: 26, color: '#E8734A' },
+    // 28,30,31,32,33,34之间的并列连线（蓝色）
+    { from: 28, to: 30, color: '#4A90D9' },
+    { from: 28, to: 31, color: '#4A90D9' },
+    { from: 28, to: 32, color: '#4A90D9' },
+    { from: 28, to: 33, color: '#4A90D9' },
+    { from: 28, to: 34, color: '#4A90D9' },
+    { from: 30, to: 31, color: '#4A90D9' },
+    { from: 30, to: 32, color: '#4A90D9' },
+    { from: 30, to: 33, color: '#4A90D9' },
+    { from: 30, to: 34, color: '#4A90D9' },
+    { from: 31, to: 32, color: '#4A90D9' },
+    { from: 31, to: 33, color: '#4A90D9' },
+    { from: 31, to: 34, color: '#4A90D9' },
+    { from: 32, to: 33, color: '#4A90D9' },
+    { from: 32, to: 34, color: '#4A90D9' },
+    { from: 33, to: 34, color: '#4A90D9' },
+    // 35,36,37之间用并列连线（蓝色）
+    { from: 35, to: 36, color: '#4A90D9' },
+    { from: 35, to: 37, color: '#4A90D9' },
+    { from: 36, to: 37, color: '#4A90D9' },
+    // 递进连线（清新绿）
+    { from: 37, to: 10, color: '#67C23A' },
+    { from: 37, to: 38, color: '#67C23A' },
+    // 39，40，42之间并列连线（蓝色）
+    { from: 39, to: 40, color: '#4A90D9' },
+    { from: 39, to: 42, color: '#4A90D9' },
+    { from: 40, to: 42, color: '#4A90D9' },
+    // 递进连线（清新绿）
+    { from: 40, to: 39, color: '#67C23A' },
+    { from: 40, to: 41, color: '#67C23A' },
+    { from: 42, to: 43, color: '#67C23A' },
+    // 44，45，46之间用并列连线（蓝色）
+    { from: 44, to: 45, color: '#4A90D9' },
+    { from: 44, to: 46, color: '#4A90D9' },
+    { from: 45, to: 46, color: '#4A90D9' },
+    // 49，47，48之间用并列连线（蓝色）
+    { from: 49, to: 47, color: '#4A90D9' },
+    { from: 49, to: 48, color: '#4A90D9' },
+    { from: 47, to: 48, color: '#4A90D9' },
+    // 1，51之间用并列连线（蓝色）
+    { from: 1, to: 51, color: '#4A90D9' },
+    // 递进连线（清新绿）
+    { from: 48, to: 50, color: '#67C23A' },
+    { from: 49, to: 50, color: '#67C23A' },
+    { from: 51, to: 52, color: '#67C23A' },
+    { from: 1, to: 52, color: '#67C23A' },
+    // 57，58，59之间用递进连线（清新绿）
+    { from: 57, to: 58, color: '#67C23A' },
+    { from: 57, to: 59, color: '#67C23A' },
+    { from: 58, to: 59, color: '#67C23A' },
+    // 53，55，1，56，57之间用并列连线（蓝色）
+    { from: 53, to: 55, color: '#4A90D9' },
+    { from: 53, to: 1, color: '#4A90D9' },
+    { from: 53, to: 56, color: '#4A90D9' },
+    { from: 53, to: 57, color: '#4A90D9' },
+    { from: 55, to: 1, color: '#4A90D9' },
+    { from: 55, to: 56, color: '#4A90D9' },
+    { from: 55, to: 57, color: '#4A90D9' },
+    { from: 1, to: 56, color: '#4A90D9' },
+    { from: 1, to: 57, color: '#4A90D9' },
+    { from: 56, to: 57, color: '#4A90D9' },
   ]
     connections.forEach(conn => {
     const fromY = (conn.from - 1) * lineHeight + lineHeight / 2
@@ -693,6 +711,26 @@ watch(currentPage, (newPage) => {
 }
 
 /* 右上角按钮组样式 */
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.legend {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: #555;
+}
+
 .top-right-buttons {
   display: flex;
   gap: 8px;
