@@ -2,17 +2,23 @@ import { fileURLToPath, URL } from 'node:url'
 
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
-import vueDevTools from 'vite-plugin-vue-devtools'
 
 // https://vite.dev/config/
-export default defineConfig({
-  plugins: [
-    vue(),
-    vueDevTools(),
-  ],
-  resolve: {
-    alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url))
+export default defineConfig(async () => {
+  const enableDevTools = process.env.VITE_ENABLE_DEVTOOLS === 'true'
+  const plugins = [vue()]
+
+  if (enableDevTools) {
+    const { default: vueDevTools } = await import('vite-plugin-vue-devtools')
+    plugins.push(vueDevTools())
+  }
+
+  return {
+    plugins,
+    resolve: {
+      alias: {
+        '@': fileURLToPath(new URL('./src', import.meta.url))
+      },
     },
-  },
+  }
 })
