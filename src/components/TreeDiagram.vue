@@ -245,12 +245,11 @@ const drawTree = () => {
   
   const margin = { top: 50, right: 200, bottom: 50, left: 200 }
 
-  // 创建可缩放的SVG容器
+  // 创建可缩放的SVG容器（边框由外层容器 CSS 提供，避免双层描边）
   const svg = d3.select(container)
     .append("svg")
     .attr("width", containerWidth)
     .attr("height", containerHeight)
-    .style("border", "1px solid #ddd")
   // 添加缩放功能
   const zoom = d3.zoom()
     .scaleExtent([0.1, 3])
@@ -355,9 +354,11 @@ onMounted(() => {
 }
 
 .tree-container h2 {
-  margin: 0 0 10px 0;
-  color: #333;
-  font-size: 24px;
+  margin: 0 0 12px;
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  color: var(--text-2);
   text-align: center;
 }
 
@@ -370,17 +371,18 @@ onMounted(() => {
 }
 
 .tree-content p {
-  color: #666;
-  font-size: 16px;
-  margin-bottom: 20px;
+  color: var(--text-3);
+  font-size: 13px;
+  margin-bottom: 16px;
 }
 
+/* 画布：白底 + 1px 描边，去掉阴影 */
 .d3-tree-container {
   width: 100%;
   height: 100%;
-  background-color: #fff;
-  border-radius: 8px;
-  border: 1px solid #e0e0e0;
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
   overflow: hidden;
   position: relative;
   cursor: grab;

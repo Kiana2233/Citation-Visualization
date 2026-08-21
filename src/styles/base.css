@@ -1,0 +1,102 @@
+/* ============================================================
+   全局基础样式 —— 极简风格
+   所有颜色 / 间距 / 圆角 / 字体在此集中定义，组件只引用变量
+   ============================================================ */
+
+:root {
+  /* 中性底色与描边 */
+  --bg: #f7f7f8;
+  --surface: #ffffff;
+  --border: #ebebee;
+  --border-strong: #dcdce0;
+
+  /* 文字层级 */
+  --text: #18181b;
+  --text-2: #5c5c66;
+  --text-3: #a0a0aa;
+
+  /* 墨色强调（替代原来的彩色渐变） */
+  --ink: #18181b;
+  --mark: #f4f4f5;
+
+  /* 引用高亮 */
+  --hl: #fdf1c4;
+  --hl-line: #e3c463;
+  --hl-soft: #fffdf4;
+
+  /* 语义色：与 d3 代码中的连线颜色保持一致，改动需同步 */
+  --c-parallel: #4a90d9; /* 并列 */
+  --c-contrast: #e8734a; /* 转折 */
+  --c-progress: #67c23a; /* 递进 */
+
+  /* 尺度 */
+  --r: 6px;
+  --r-sm: 4px;
+  --gap: 16px;
+  --pad: 16px;
+  --dur: 0.15s;
+
+  /* 字体 */
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+    "Hiragino Sans GB", "Microsoft YaHei", Arial, sans-serif;
+  --font-serif: "Songti SC", "SimSun", "宋体", Georgia, serif;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* 细滚动条：极简风格下滚动条不参与视觉竞争 */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-strong) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 99px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-3);
+}
+
+/* 键盘焦点：统一用细描边，不用阴影光圈 */
+:focus-visible {
+  outline: 1px solid var(--text-3);
+  outline-offset: 2px;
+}
+
+/* d3 提示框挂在 body 上，不受组件 scoped 样式影响，故在此定义 */
+.tooltip {
+  font-family: var(--font-sans);
+  letter-spacing: 0.02em;
+}

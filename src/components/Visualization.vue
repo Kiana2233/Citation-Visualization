@@ -580,18 +580,23 @@ watch(currentPage, (newPage) => {
 </script>
 
 <style scoped>
+/* 面板标题栏：小字号 + 字距，作为弱层级标签 */
 .header {
-  border-bottom: 1px solid #ccc;
-  padding: 4px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 16px;
-  font-weight: bold;
+  gap: 12px;
+  padding: 0 0 10px;
+  margin-bottom: 12px;
+  border-bottom: 1px solid var(--border);
 }
 
 .header-title {
   flex-shrink: 0;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  color: var(--text-2);
 }
 
 .container {
@@ -610,56 +615,41 @@ watch(currentPage, (newPage) => {
   flex-direction: column;
 }
 
+/* 操作提示条：浅灰底 + 无边框，不用渐变和阴影 */
 .usage-tip {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  padding: 12px 20px;
-  margin: 10px;
-  border-radius: 8px;
   display: flex;
   align-items: center;
   gap: 10px;
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
-  animation: slideDown 0.5s ease-out;
-}
-
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  margin: 0 0 12px;
+  padding: 9px 12px;
+  background-color: var(--mark);
+  border-radius: var(--r-sm);
+  color: var(--text-2);
+  font-size: 13px;
 }
 
 .tip-icon {
-  font-size: 20px;
+  font-size: 14px;
+  line-height: 1;
 }
 
 .tip-text {
   flex: 1;
-  font-size: 14px;
-  font-weight: 500;
 }
 
 .dismiss-btn {
-  background: rgba(255, 255, 255, 0.2);
+  padding: 0 2px;
   border: none;
-  color: white;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  cursor: pointer;
-  font-size: 18px;
+  background: none;
+  color: var(--text-3);
+  font-size: 16px;
   line-height: 1;
-  transition: all 0.3s ease;
+  cursor: pointer;
+  transition: color var(--dur) ease;
 }
 
 .dismiss-btn:hover {
-  background: rgba(255, 255, 255, 0.3);
-  transform: scale(1.1);
+  color: var(--text);
 }
 
 .d3-container {
@@ -676,13 +666,13 @@ watch(currentPage, (newPage) => {
   overflow: auto;
 }
 
-/* 合并的树图页面样式 */
+/* 合并的树图页面 */
 .combined-tree-page {
   flex: 1;
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: var(--gap);
   overflow: hidden;
 }
 
@@ -690,19 +680,19 @@ watch(currentPage, (newPage) => {
   flex: 1;
   display: flex;
   flex-direction: column;
-  border: 1px solid #dcdfe6;
-  border-radius: 8px;
-  background-color: #ffffff;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  background-color: var(--surface);
   overflow: hidden;
 }
 
 .section-header {
-  border-bottom: 1px solid #ccc;
-  padding: 8px 12px;
-  font-size: 14px;
-  font-weight: bold;
-  background-color: #f8f9fa;
+  padding: 9px 14px;
+  border-bottom: 1px solid var(--border);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  color: var(--text-2);
 }
 
 .tree-component {
@@ -710,90 +700,68 @@ watch(currentPage, (newPage) => {
   overflow: hidden;
 }
 
-/* 右上角按钮组样式 */
+/* 右上角：图例 + 按钮组 */
 .header-right {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 18px;
 }
 
 .legend {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
 }
 
 .legend-item {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 5px;
   font-size: 12px;
-  color: #555;
+  font-weight: 400;
+  color: var(--text-2);
 }
 
 .top-right-buttons {
   display: flex;
-  gap: 8px;
+  gap: 6px;
 }
 
+/* 导航按钮：描边 + 文字，选中态用墨色实底，不用渐变/位移/阴影 */
 .nav-btn {
-  padding: 6px 12px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
+  padding: 5px 12px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-sm);
+  background: transparent;
+  color: var(--text-2);
+  font-family: inherit;
   font-size: 12px;
-  font-weight: 500;
-  color: white;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  font-weight: 400;
+  line-height: 1.5;
+  cursor: pointer;
+  transition: color var(--dur) ease, border-color var(--dur) ease,
+    background-color var(--dur) ease;
 }
 
 .nav-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  color: var(--text);
+  border-color: var(--text-3);
 }
 
-.nav-btn:active {
-  transform: translateY(0);
-}
-
-/* 激活状态 */
 .nav-btn.active {
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25);
-  transform: translateY(-2px);
-  font-weight: 600;
+  background-color: var(--ink);
+  border-color: var(--ink);
+  color: var(--surface);
 }
 
-/* 不同按钮的颜色 */
-.home-btn {
-  background: linear-gradient(135deg, #667eea, #764ba2);
-}
-
-.home-btn:hover {
-  background: linear-gradient(135deg, #764ba2, #667eea);
-}
-
-.tree-btn {
-  background: linear-gradient(135deg, #4CAF50, #45a049);
-}
-
-.tree-btn:hover {
-  background: linear-gradient(135deg, #45a049, #3d8b40);
-}
-
-.full-btn {
-  background: linear-gradient(135deg, #4ECDC4, #45B7AF);
-}
-
-.full-btn:hover {
-  background: linear-gradient(135deg, #45B7AF, #3DA199);
-}
-
+/* 清除高亮是次要操作，视觉权重再降一级 */
 .clear-btn {
-  background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+  color: var(--text-3);
+  border-color: var(--border);
 }
 
 .clear-btn:hover {
-  background: linear-gradient(135deg, #7f8c8d, #6c7a7b);
+  color: var(--text-2);
+  border-color: var(--border-strong);
 }
 </style>

@@ -861,12 +861,16 @@ export default {
 }
 </script>
 <style scoped>
+/* 面板标题：与其它面板保持同一层级样式 */
 .header {
-  border-bottom: 1px solid #ccc;
-  padding: 4px;
+  padding: 0 0 10px;
+  margin-bottom: 12px;
+  border-bottom: 1px solid var(--border);
   text-align: left;
-  font-size: 16px;
-  font-weight: bold;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  color: var(--text-2);
 }
 
 .paper-container {
@@ -877,96 +881,95 @@ export default {
   flex-direction: column;
 }
 
+/* 正文区：论文保留衬线体，阅读感更接近纸面 */
 .research-paper {
   flex: 1;
   width: 100%;
-  overflow-y: auto; /* 垂直滚动条 */
-  overflow-x: hidden; /* 隐藏水平滚动条 */
-  font-family: "SimSun", "宋体", serif;
-  line-height: 1.6;
-  padding: 20px;
-  padding-right: 10px; /* 给滚动条留出空间 */
-  box-sizing: border-box;
-  color: #333;
+  overflow-y: auto;
+  overflow-x: hidden;
+  font-family: var(--font-serif);
+  font-size: 15px;
+  line-height: 1.85;
+  padding: 4px 12px 4px 4px;
+  color: var(--text);
   word-wrap: break-word;
   word-break: break-word;
 }
 
-/* 自定义滚动条样式 */
-.research-paper::-webkit-scrollbar {
-  width: 8px;
-}
-
-.research-paper::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 4px;
-}
-
-.research-paper::-webkit-scrollbar-thumb {
-  background: #888;
-  border-radius: 4px;
-}
-
-.research-paper::-webkit-scrollbar-thumb:hover {
-  background: #555;
-}
-
 .paper-header {
   text-align: center;
-  margin-bottom: 30px;
+  margin-bottom: 36px;
 }
 
 .title {
-  font-size: 22px;
-  font-weight: bold;
-  margin-bottom: 15px;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.5;
+  margin-bottom: 14px;
   word-wrap: break-word;
 }
 
 .authors {
   margin-bottom: 10px;
+  color: var(--text-2);
 }
 
 .affiliations {
-  font-size: 14px;
+  font-size: 13px;
   margin-top: 5px;
+  color: var(--text-3);
 }
 
-.abstract, .english-abstract {
-  margin-bottom: 30px;
+.abstract,
+.english-abstract {
+  margin-bottom: 28px;
+  padding: 16px 18px;
+  background-color: #fbfbfc;
+  border-left: 2px solid var(--border-strong);
   text-align: justify;
+  font-size: 14px;
   word-wrap: break-word;
 }
 
-.abstract h2, .english-abstract h2 {
-  font-size: 16px;
-  text-align: center;
-  margin-bottom: 10px;
+.abstract h2,
+.english-abstract h2 {
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  color: var(--text-3);
+  text-align: left;
+  margin: 0 0 10px;
 }
 
 .keywords {
   margin-top: 10px;
-  font-weight: bold;
+  font-weight: 500;
+  color: var(--text-2);
 }
 
+/* 标题层级：靠字号与留白区分，不加装饰 */
 .paper-content h2 {
-  font-size: 18px;
-  margin: 25px 0 15px;
+  font-size: 16px;
+  font-weight: 600;
+  margin: 34px 0 14px;
   text-align: center;
 }
 
 .paper-content h3 {
-  font-size: 16px;
-  margin: 20px 0 10px;
+  font-size: 15px;
+  font-weight: 600;
+  margin: 24px 0 10px;
 }
 
 .paper-content h4 {
   font-size: 14px;
-  margin: 15px 0 8px;
+  font-weight: 600;
+  color: var(--text-2);
+  margin: 18px 0 8px;
 }
 
 .paper-content p {
-  margin-bottom: 12px;
+  margin-bottom: 14px;
   text-align: justify;
   text-indent: 2em;
   word-wrap: break-word;
@@ -975,59 +978,82 @@ export default {
 }
 
 .hypothesis {
-  font-weight: bold;
-  margin: 15px 0;
+  font-weight: 600;
+  margin: 18px 0;
 }
 
 .formula {
   text-align: center;
-  margin: 15px 0;
+  text-indent: 0;
+  margin: 16px 0;
   font-style: italic;
+  color: var(--text-2);
 }
 
-.figure, .table {
-  margin: 20px 0;
+.figure,
+.table {
+  margin: 24px 0;
   text-align: center;
 }
 
-.figure-title, .table-title {
-  font-weight: bold;
+.figure-title,
+.table-title {
+  font-weight: 500;
+  font-size: 13px;
+  color: var(--text-2);
   margin-bottom: 10px;
 }
 
+/* 表格：仅保留横线，去掉竖线与灰色表头底 */
 table {
   width: 100%;
   border-collapse: collapse;
-  margin: 15px 0;
+  margin: 14px 0;
+  font-size: 13px;
 }
 
-th, td {
-  border: 1px solid #ddd;
-  padding: 8px;
+th,
+td {
+  border: none;
+  border-bottom: 1px solid var(--border);
+  padding: 8px 6px;
   text-align: center;
 }
 
 th {
-  background-color: #f2f2f2;
+  border-bottom: 1px solid var(--border-strong);
+  background-color: transparent;
+  font-weight: 500;
+  color: var(--text-2);
 }
 
 .table-note {
-  font-size: 14px;
+  font-size: 12px;
+  color: var(--text-3);
   text-align: left;
   margin-top: 10px;
 }
 
 .references {
-  margin-top: 40px;
+  margin-top: 44px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+  font-size: 13px;
+  color: var(--text-2);
 }
 
 .references h2 {
-  text-align: center;
-  margin-bottom: 15px;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  color: var(--text-3);
+  text-align: left;
+  margin: 0 0 14px;
 }
 
 .references ol {
   padding-left: 2em;
+  margin: 0;
 }
 
 .references li {
@@ -1036,12 +1062,14 @@ th {
 }
 
 .paper-footer {
-  margin-top: 30px;
-  font-size: 14px;
+  margin-top: 28px;
+  font-size: 12px;
+  color: var(--text-3);
 }
 
 .footnote {
-  font-size: 14px;
+  font-size: 12px;
+  color: var(--text-3);
   margin-top: 10px;
 }
 
@@ -1050,50 +1078,33 @@ sup {
   font-size: smaller;
 }
 
-/* 高亮引用的样式 - 新的简单方法 */
+/* 引用高亮：荧光笔式底色，不用彩色渐变与缩放动画 */
 .highlight-ref {
-  background: linear-gradient(120deg, #ff6b6b 0%, #ee5a6f 100%);
-  color: white;
-  padding: 2px 6px;
-  border-radius: 4px;
-  font-weight: bold;
-  box-shadow: 0 2px 10px rgba(238, 90, 111, 0.5);
-  animation: highlight-pulse 0.6s ease-in-out;
+  background-color: var(--hl);
+  border-radius: 2px;
+  padding: 0 3px;
+  color: var(--text);
+  font-weight: 600;
+  animation: mark-in 0.25s ease-out;
 }
 
-/* 包含高亮引用的段落背景高亮 */
+/* 含高亮引用的段落：左侧一条细标线 + 极浅底色 */
 .research-paper p.has-highlight {
-  background: linear-gradient(120deg, rgba(255, 234, 167, 0.3) 0%, rgba(253, 203, 110, 0.3) 100%);
-  padding: 15px;
-  border-radius: 8px;
-  border-left: 4px solid #fdcb6e;
-  margin: 15px 0;
-  box-shadow: 0 2px 12px rgba(253, 203, 110, 0.3);
-  animation: paragraph-highlight 0.6s ease-in-out;
-  transition: all 0.3s ease;
+  background-color: var(--hl-soft);
+  border-left: 2px solid var(--hl-line);
+  border-radius: 0 var(--r-sm) var(--r-sm) 0;
+  padding: 10px 14px;
+  margin: 14px 0;
+  transition: background-color var(--dur) ease;
 }
 
-@keyframes highlight-pulse {
-  0%, 100% {
-    transform: scale(1);
-    box-shadow: 0 2px 10px rgba(238, 90, 111, 0.5);
+@keyframes mark-in {
+  from {
+    background-color: transparent;
   }
-  50% {
-    transform: scale(1.1);
-    box-shadow: 0 4px 20px rgba(238, 90, 111, 0.8);
+  to {
+    background-color: var(--hl);
   }
 }
-
-@keyframes paragraph-highlight {
-  0% {
-    background: transparent;
-    box-shadow: none;
-  }
-  100% {
-    background: linear-gradient(120deg, rgba(255, 234, 167, 0.3) 0%, rgba(253, 203, 110, 0.3) 100%);
-    box-shadow: 0 2px 12px rgba(253, 203, 110, 0.3);
-  }
-}
-
 </style>
 

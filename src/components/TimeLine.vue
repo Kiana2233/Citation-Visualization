@@ -639,7 +639,7 @@ function drawTimeline() {
     .append('text')
     .attr('x', width / 2)
     .attr('y', 35)
-    .attr('fill', 'black')
+    .attr('fill', '#5c5c66')
     .style('text-anchor', 'middle')
     .style('font-size', '12px')
     .text('年份')
@@ -651,7 +651,7 @@ function drawTimeline() {
     .attr('transform', 'rotate(-90)')
     .attr('y', -35)
     .attr('x', -height / 2)
-    .attr('fill', 'black')
+    .attr('fill', '#5c5c66')
     .style('text-anchor', 'middle')
     .style('font-size', '12px')
     .text('文献数量')
@@ -660,10 +660,10 @@ function drawTimeline() {
   g.append('path')
     .datum(timelineData)
     .attr('fill', 'none')
-    .attr('stroke', '#007bff')
-    .attr('stroke-width', 2)
+    .attr('stroke', '#4A90D9')
+    .attr('stroke-width', 1.5)
     .attr('d', line)
-  
+
   // 绘制数据点
   g.selectAll('.dot')
     .data(timelineData)
@@ -671,47 +671,48 @@ function drawTimeline() {
     .attr('class', 'dot')
     .attr('cx', d => xScale(d.year))
     .attr('cy', d => yScale(d.count))
-    .attr('r', 4)
-    .attr('fill', '#007bff')
+    .attr('r', 3)
+    .attr('fill', '#4A90D9')
     .style('cursor', 'pointer')
     .on('mouseover', function(event, d) {
-      // 创建提示框
+      // 创建提示框（极简：深墨底 + 细圆角）
       const tooltip = d3.select('body').append('div')
         .attr('class', 'tooltip')
         .style('position', 'absolute')
-        .style('background', 'rgba(0, 0, 0, 0.8)')
-        .style('color', 'white')
-        .style('padding', '8px')
+        .style('background', 'rgba(24, 24, 27, 0.92)')
+        .style('color', '#fff')
+        .style('padding', '5px 8px')
         .style('border-radius', '4px')
         .style('font-size', '12px')
+        .style('line-height', '1.4')
         .style('pointer-events', 'none')
         .style('opacity', 0)
-      
+
       tooltip.transition()
-        .duration(200)
+        .duration(150)
         .style('opacity', 1)
-      
+
       tooltip.html(`${d.year}年: ${d.count}篇文献`)
         .style('left', (event.pageX + 10) + 'px')
         .style('top', (event.pageY - 10) + 'px')
-      
+
       // 高亮当前点
       d3.select(this)
         .transition()
-        .duration(200)
-        .attr('r', 6)
-        .attr('fill', '#0056b3')
+        .duration(150)
+        .attr('r', 5)
+        .attr('fill', '#E8734A')
     })
     .on('mouseout', function() {
       // 移除提示框
       d3.selectAll('.tooltip').remove()
-      
+
       // 恢复点的样式
       d3.select(this)
         .transition()
-        .duration(200)
-        .attr('r', 4)
-        .attr('fill', '#007bff')
+        .duration(150)
+        .attr('r', 3)
+        .attr('fill', '#4A90D9')
     })
   
   // 添加网格线
@@ -749,12 +750,16 @@ onMounted(() => {
 </script>
 
 <style scoped>
+/* 面板标题：与其它面板保持同一层级样式 */
 .header {
-  border-bottom: 1px solid #ccc;
-  padding: 4px;
+  padding: 0 0 10px;
+  margin-bottom: 12px;
+  border-bottom: 1px solid var(--border);
   text-align: left;
-  font-size: 16px;
-  font-weight: bold;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  color: var(--text-2);
 }
 
 .timeline-wrapper {
@@ -767,13 +772,14 @@ onMounted(() => {
 .timeline-container {
   flex: 1;
   width: 100%;
-  background: white;
+  background: var(--surface);
   position: relative;
   overflow: hidden;
 }
 
+/* 坐标轴与网格：只留最低必要的对比度 */
 :deep(.grid line) {
-  stroke: #ddd;
+  stroke: #f1f1f4;
 }
 
 :deep(.grid path) {
@@ -781,15 +787,15 @@ onMounted(() => {
 }
 
 :deep(.domain) {
-  stroke: #333;
+  stroke: var(--border-strong);
 }
 
 :deep(.tick line) {
-  stroke: #333;
+  stroke: var(--border-strong);
 }
 
 :deep(.tick text) {
-  fill: #333;
+  fill: var(--text-3);
   font-size: 11px;
 }
 </style>
